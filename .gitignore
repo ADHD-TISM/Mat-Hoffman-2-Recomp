@@ -1,0 +1,18 @@
+# Whitelist: only the project's own source is tracked.
+# Never commit game data: the disc, the game image, generated code (gen*/ embed
+# or translate game code), VU1 code snapshots, builds, logs, screenshots.
+/*
+!/.gitignore
+!/mhrecomp/
+
+/mhrecomp/*
+!/mhrecomp/NOTES.md
+!/mhrecomp/build.sh
+!/mhrecomp/regen.sh
+!/mhrecomp/extra_ee.txt
+!/mhrecomp/runtime/
+!/mhrecomp/tools/
+!/mhrecomp/gen_vu/
+/mhrecomp/gen_vu/*
+!/mhrecomp/gen_vu/*.pcs
+/mhrecomp/tools/__pycache__/
