@@ -4,15 +4,22 @@
 /*
 !/.gitignore
 !/mhrecomp/
+!/launcher/
 
 /mhrecomp/*
 !/mhrecomp/NOTES.md
 !/mhrecomp/build.sh
 !/mhrecomp/regen.sh
 !/mhrecomp/extra_ee.txt
+!/mhrecomp/vu_recipe.json
 !/mhrecomp/runtime/
 !/mhrecomp/tools/
 !/mhrecomp/gen_vu/
 /mhrecomp/gen_vu/*
 !/mhrecomp/gen_vu/*.pcs
 /mhrecomp/tools/__pycache__/
+
+/launcher/*
+!/launcher/mh2launcher.py
+!/launcher/build_exe.sh
+!/launcher/test_launcher.py

@@ -76,6 +76,19 @@ reaches the main menu by ~2300.
   gen_vu/vu1_rec.h gen_vu/vu1_*.bin`, build (vu.c ~3 min). Other levels will
   bring new programs ("not recompiled, interpreting" in the log): record again.
 
+## Launcher (2026-11-23)
+`launcher/mh2launcher.py` (copy of the Dave Mirra 2 launcher, game names
+changed): reads SLUS_203.35 and PS2SOUND.IRX from the user's image, runs the
+recompilers (`--code 42bf00-432980`), rebuilds the VU1 snapshots from
+`vu_recipe.json`, compiles into `work/`, puts mh2.exe + mh2.ini in `game/`,
+and starts it with `--image <iso> <game folder>`. Root = the repository folder;
+the disc image goes in `Mat Hoffman 2/` or is chosen on the Build tab.
+`sh launcher/build_exe.sh` makes `Mat Hoffman 2 Launcher.exe` (PyInstaller).
+After recording new VU1 programs: `python -I tools/mkvurecipe.py gen_vu
+vu_recipe.json ../disc/SLUS_203.35` (all 22 programs are inside the ELF).
+Developer build with an own clang: set MH2_CLANG. Update tab downloads need a
+GitHub release of ADHD-TISM/Mat-Hoffman-2-Recomp (none yet).
+
 ## Debug aids added
 - `ee_backtrace()` (cdvd.c): return addresses found on the guest stack.
 - `recomp_ee.py --bbtrace ADDR`: logs every block of one function
@@ -91,7 +104,8 @@ reaches the main menu by ~2300.
    not modelled (not needed so far: the game syncs textures with VIF1
    interrupts); cdvd.c image-type detection by size.
 4. Leftovers from the old game: skip_intro movie names in pad.c, menu.c texts,
-   launcher, widescreen hooks, git repo.
+   widescreen hooks. Two VU1 programs seen in the level are still interpreted
+   (f75b7e19549cb6fd, aaba90026769be9d): record and add them.
 6. Known game names: 1dd4b0 fopen, 1dd6a0 fread, 1dd380 file table entry,
    1dd540 CD read, 36b940 snprintf, 36a950 printf core, 3a0d00 strlen,
    22ff60 end of frame / swap, 230870 display registers, 20f370 pad poll.

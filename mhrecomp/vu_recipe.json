@@ -1,0 +1,1667 @@
+{
+ "comment": "VU1 code snapshots rebuilt from the game's files at build time (the launcher reads this); vu = offset in VU1 code memory, file = offset in from_file",
+ "snapshots": [
+  {
+   "hash": "0dc8b92aa902eaab",
+   "size": 16384,
+   "sha256": "72a90a6cc4fb6055dea6ec106fcc5994cc2cba0fcaff2af5a86a52a38eae7f98",
+   "pieces": [
+    {
+     "vu": 0,
+     "from_file": "SLUS_203.35",
+     "file": 2845824,
+     "len": 32
+    },
+    {
+     "vu": 128,
+     "from_file": "SLUS_203.35",
+     "file": 2848936,
+     "len": 1144
+    },
+    {
+     "vu": 1408,
+     "from_file": "SLUS_203.35",
+     "file": 2827640,
+     "len": 1736
+    },
+    {
+     "vu": 3144,
+     "from_file": "SLUS_203.35",
+     "file": 2933456,
+     "len": 312
+    },
+    {
+     "vu": 3456,
+     "from_file": "SLUS_203.35",
+     "file": 2933776,
+     "len": 2048
+    },
+    {
+     "vu": 5504,
+     "from_file": "SLUS_203.35",
+     "file": 2874472,
+     "len": 160
+    },
+    {
+     "vu": 5664,
+     "from_file": "SLUS_203.35",
+     "file": 2935992,
+     "len": 1888
+    },
+    {
+     "vu": 7552,
+     "from_file": "SLUS_203.35",
+     "file": 2937888,
+     "len": 1664
+    },
+    {
+     "vu": 9216,
+     "from_file": "SLUS_203.35",
+     "file": 2878160,
+     "len": 64
+    },
+    {
+     "vu": 11136,
+     "from_file": "SLUS_203.35",
+     "file": 2850120,
+     "len": 2048
+    },
+    {
+     "vu": 13184,
+     "from_file": "SLUS_203.35",
+     "file": 2851352,
+     "len": 88
+    },
+    {
+     "vu": 13272,
+     "from_file": "SLUS_203.35",
+     "file": 2852264,
+     "len": 1880
+    }
+   ],
+   "pcs": [
+    "0000",
+    "0580"
+   ]
+  },
+  {
+   "hash": "2ac6def0def587c2",
+   "size": 16384,
+   "sha256": "48ad53fc445bcc9eabe11a4b261c0f1c2be63492579bf4ec7e178547da4cd36d",
+   "pieces": [
+    {
+     "vu": 0,
+     "from_file": "SLUS_203.35",
+     "file": 2845824,
+     "len": 32
+    },
+    {
+     "vu": 128,
+     "from_file": "SLUS_203.35",
+     "file": 2848936,
+     "len": 1144
+    },
+    {
+     "vu": 11136,
+     "from_file": "SLUS_203.35",
+     "file": 2850120,
+     "len": 2048
+    },
+    {
+     "vu": 13184,
+     "from_file": "SLUS_203.35",
+     "file": 2851352,
+     "len": 88
+    },
+    {
+     "vu": 13272,
+     "from_file": "SLUS_203.35",
+     "file": 2852264,
+     "len": 1880
+    }
+   ],
+   "pcs": [
+    "0000",
+    "0580"
+   ]
+  },
+  {
+   "hash": "2b91b57a94efb0bc",
+   "size": 16384,
+   "sha256": "d805e5dcfa262fae9aa3b2a31f5c235a30d0c07fe3707971d7aeaf0e6f080791",
+   "pieces": [
+    {
+     "vu": 0,
+     "from_file": "SLUS_203.35",
+     "file": 2845824,
+     "len": 32
+    },
+    {
+     "vu": 128,
+     "from_file": "SLUS_203.35",
+     "file": 2848936,
+     "len": 1144
+    },
+    {
+     "vu": 1408,
+     "from_file": "SLUS_203.35",
+     "file": 2827640,
+     "len": 1736
+    },
+    {
+     "vu": 11136,
+     "from_file": "SLUS_203.35",
+     "file": 2850120,
+     "len": 2048
+    },
+    {
+     "vu": 13184,
+     "from_file": "SLUS_203.35",
+     "file": 2851352,
+     "len": 88
+    },
+    {
+     "vu": 13272,
+     "from_file": "SLUS_203.35",
+     "file": 2852264,
+     "len": 1880
+    }
+   ],
+   "pcs": [
+    "0000",
+    "0580"
+   ]
+  },
+  {
+   "hash": "2f3878c3bd658984",
+   "size": 16384,
+   "sha256": "5eea106d60de46cb55d7a6ceb71c67d763f5a4343b39c45e7ce06237f2b7f30e",
+   "pieces": [
+    {
+     "vu": 0,
+     "from_file": "SLUS_203.35",
+     "file": 2845824,
+     "len": 32
+    },
+    {
+     "vu": 128,
+     "from_file": "SLUS_203.35",
+     "file": 2848936,
+     "len": 1144
+    },
+    {
+     "vu": 1408,
+     "from_file": "SLUS_203.35",
+     "file": 2878264,
+     "len": 2048
+    },
+    {
+     "vu": 3456,
+     "from_file": "SLUS_203.35",
+     "file": 2880080,
+     "len": 120
+    },
+    {
+     "vu": 3576,
+     "from_file": "SLUS_203.35",
+     "file": 2880440,
+     "len": 1928
+    },
+    {
+     "vu": 5504,
+     "from_file": "SLUS_203.35",
+     "file": 2882376,
+     "len": 2048
+    },
+    {
+     "vu": 7552,
+     "from_file": "SLUS_203.35",
+     "file": 2884432,
+     "len": 1608
+    },
+    {
+     "vu": 9160,
+     "from_file": "SLUS_203.35",
+     "file": 2878104,
+     "len": 120
+    },
+    {
+     "vu": 11136,
+     "from_file": "SLUS_203.35",
+     "file": 2850120,
+     "len": 2048
+    },
+    {
+     "vu": 13184,
+     "from_file": "SLUS_203.35",
+     "file": 2851352,
+     "len": 88
+    },
+    {
+     "vu": 13272,
+     "from_file": "SLUS_203.35",
+     "file": 2852264,
+     "len": 1880
+    }
+   ],
+   "pcs": [
+    "0000",
+    "0080",
+    "04d8",
+    "1938",
+    "0580"
+   ]
+  },
+  {
+   "hash": "332043fa2241a939",
+   "size": 16384,
+   "sha256": "a5d2400a0008c5e407ef311a53200a7587704b07d4e809ee571c44f24a5cea05",
+   "pieces": [
+    {
+     "vu": 0,
+     "from_file": "SLUS_203.35",
+     "file": 2845824,
+     "len": 32
+    },
+    {
+     "vu": 128,
+     "from_file": "SLUS_203.35",
+     "file": 2848936,
+     "len": 1144
+    },
+    {
+     "vu": 1408,
+     "from_file": "SLUS_203.35",
+     "file": 2907624,
+     "len": 2048
+    },
+    {
+     "vu": 3456,
+     "from_file": "SLUS_203.35",
+     "file": 2909680,
+     "len": 1760
+    },
+    {
+     "vu": 11136,
+     "from_file": "SLUS_203.35",
+     "file": 2850120,
+     "len": 2048
+    },
+    {
+     "vu": 13184,
+     "from_file": "SLUS_203.35",
+     "file": 2851352,
+     "len": 88
+    },
+    {
+     "vu": 13272,
+     "from_file": "SLUS_203.35",
+     "file": 2852264,
+     "len": 1880
+    }
+   ],
+   "pcs": [
+    "0000",
+    "0080",
+    "04d8",
+    "1090",
+    "0580"
+   ]
+  },
+  {
+   "hash": "3b2dc87979b830ec",
+   "size": 16384,
+   "sha256": "0c78f7417ec5fbe3c6a3995f216503cb7e5081266b97c45cad842b97d0e9c1ac",
+   "pieces": [
+    {
+     "vu": 0,
+     "from_file": "SLUS_203.35",
+     "file": 2845824,
+     "len": 32
+    },
+    {
+     "vu": 128,
+     "from_file": "SLUS_203.35",
+     "file": 2848936,
+     "len": 1144
+    },
+    {
+     "vu": 1408,
+     "from_file": "SLUS_203.35",
+     "file": 2843416,
+     "len": 2048
+    },
+    {
+     "vu": 3456,
+     "from_file": "SLUS_203.35",
+     "file": 2845472,
+     "len": 336
+    },
+    {
+     "vu": 3792,
+     "from_file": "SLUS_203.35",
+     "file": 2872720,
+     "len": 1712
+    },
+    {
+     "vu": 5504,
+     "from_file": "SLUS_203.35",
+     "file": 2874440,
+     "len": 2048
+    },
+    {
+     "vu": 7552,
+     "from_file": "SLUS_203.35",
+     "file": 2876496,
+     "len": 1728
+    },
+    {
+     "vu": 11136,
+     "from_file": "SLUS_203.35",
+     "file": 2850120,
+     "len": 2048
+    },
+    {
+     "vu": 13184,
+     "from_file": "SLUS_203.35",
+     "file": 2851352,
+     "len": 88
+    },
+    {
+     "vu": 13272,
+     "from_file": "SLUS_203.35",
+     "file": 2852264,
+     "len": 1880
+    }
+   ],
+   "pcs": [
+    "0000",
+    "0080",
+    "04d8",
+    "0c40",
+    "0ec0",
+    "0580"
+   ]
+  },
+  {
+   "hash": "3c3c0bd6c48b2aa7",
+   "size": 16384,
+   "sha256": "f83368c8c32c01af8b2ca0943434729947d121e30debafd94869e5d0ad236c06",
+   "pieces": [
+    {
+     "vu": 0,
+     "from_file": "SLUS_203.35",
+     "file": 2845824,
+     "len": 32
+    },
+    {
+     "vu": 128,
+     "from_file": "SLUS_203.35",
+     "file": 2848936,
+     "len": 1144
+    },
+    {
+     "vu": 1408,
+     "from_file": "SLUS_203.35",
+     "file": 2870328,
+     "len": 64
+    },
+    {
+     "vu": 1472,
+     "from_file": "SLUS_203.35",
+     "file": 2956264,
+     "len": 1984
+    },
+    {
+     "vu": 3456,
+     "from_file": "SLUS_203.35",
+     "file": 2958256,
+     "len": 2048
+    },
+    {
+     "vu": 5504,
+     "from_file": "SLUS_203.35",
+     "file": 2960312,
+     "len": 2048
+    },
+    {
+     "vu": 7552,
+     "from_file": "SLUS_203.35",
+     "file": 2962368,
+     "len": 1192
+    },
+    {
+     "vu": 8744,
+     "from_file": "SLUS_203.35",
+     "file": 2939080,
+     "len": 472
+    },
+    {
+     "vu": 9216,
+     "from_file": "SLUS_203.35",
+     "file": 2878160,
+     "len": 64
+    },
+    {
+     "vu": 11136,
+     "from_file": "SLUS_203.35",
+     "file": 2850120,
+     "len": 2048
+    },
+    {
+     "vu": 13184,
+     "from_file": "SLUS_203.35",
+     "file": 2851352,
+     "len": 88
+    },
+    {
+     "vu": 13272,
+     "from_file": "SLUS_203.35",
+     "file": 2852264,
+     "len": 1880
+    }
+   ],
+   "pcs": [
+    "0000",
+    "0080",
+    "04d8",
+    "0580"
+   ]
+  },
+  {
+   "hash": "3fba18191bb012df",
+   "size": 16384,
+   "sha256": "fa4b12e8eb477c3ffc8f7c678f16bcfc8dd3e6c77a9ce88fdfb4bb070954c172",
+   "pieces": [
+    {
+     "vu": 0,
+     "from_file": "SLUS_203.35",
+     "file": 2845824,
+     "len": 32
+    },
+    {
+     "vu": 128,
+     "from_file": "SLUS_203.35",
+     "file": 2848936,
+     "len": 1144
+    },
+    {
+     "vu": 1408,
+     "from_file": "SLUS_203.35",
+     "file": 2907624,
+     "len": 2048
+    },
+    {
+     "vu": 3456,
+     "from_file": "SLUS_203.35",
+     "file": 2909680,
+     "len": 1752
+    },
+    {
+     "vu": 5208,
+     "from_file": "SLUS_203.35",
+     "file": 2872968,
+     "len": 152
+    },
+    {
+     "vu": 5360,
+     "from_file": "SLUS_203.35",
+     "file": 2874288,
+     "len": 144
+    },
+    {
+     "vu": 5504,
+     "from_file": "SLUS_203.35",
+     "file": 2874440,
+     "len": 2048
+    },
+    {
+     "vu": 7552,
+     "from_file": "SLUS_203.35",
+     "file": 2876496,
+     "len": 1728
+    },
+    {
+     "vu": 11136,
+     "from_file": "SLUS_203.35",
+     "file": 2850120,
+     "len": 2048
+    },
+    {
+     "vu": 13184,
+     "from_file": "SLUS_203.35",
+     "file": 2851352,
+     "len": 88
+    },
+    {
+     "vu": 13272,
+     "from_file": "SLUS_203.35",
+     "file": 2852264,
+     "len": 1880
+    }
+   ],
+   "pcs": [
+    "0000",
+    "0080",
+    "04d8",
+    "1418",
+    "1090",
+    "0878",
+    "0e08",
+    "0580"
+   ]
+  },
+  {
+   "hash": "4c1569028fce77a2",
+   "size": 16384,
+   "sha256": "981e2853b98c85a2d0f8c3bb0f6757f23ee208abdff6cc586d7a7dddb8d35053",
+   "pieces": [
+    {
+     "vu": 0,
+     "from_file": "SLUS_203.35",
+     "file": 2845824,
+     "len": 32
+    },
+    {
+     "vu": 128,
+     "from_file": "SLUS_203.35",
+     "file": 2848936,
+     "len": 1144
+    },
+    {
+     "vu": 1408,
+     "from_file": "SLUS_203.35",
+     "file": 2907624,
+     "len": 2048
+    },
+    {
+     "vu": 3456,
+     "from_file": "SLUS_203.35",
+     "file": 2909680,
+     "len": 1752
+    },
+    {
+     "vu": 5208,
+     "from_file": "SLUS_203.35",
+     "file": 2882072,
+     "len": 296
+    },
+    {
+     "vu": 5504,
+     "from_file": "SLUS_203.35",
+     "file": 2882376,
+     "len": 2048
+    },
+    {
+     "vu": 7552,
+     "from_file": "SLUS_203.35",
+     "file": 2884432,
+     "len": 1608
+    },
+    {
+     "vu": 9160,
+     "from_file": "SLUS_203.35",
+     "file": 2878104,
+     "len": 120
+    },
+    {
+     "vu": 11136,
+     "from_file": "SLUS_203.35",
+     "file": 2850120,
+     "len": 2048
+    },
+    {
+     "vu": 13184,
+     "from_file": "SLUS_203.35",
+     "file": 2851352,
+     "len": 88
+    },
+    {
+     "vu": 13272,
+     "from_file": "SLUS_203.35",
+     "file": 2852264,
+     "len": 1880
+    }
+   ],
+   "pcs": [
+    "0000",
+    "0080",
+    "04d8",
+    "1090",
+    "1418",
+    "0580"
+   ]
+  },
+  {
+   "hash": "4cb9538a9d838027",
+   "size": 16384,
+   "sha256": "28de62913cd1f6d218be36221ab4868e46fee79f9c9c9113dbb2b94e50c66a7c",
+   "pieces": [
+    {
+     "vu": 0,
+     "from_file": "SLUS_203.35",
+     "file": 2845824,
+     "len": 32
+    },
+    {
+     "vu": 128,
+     "from_file": "SLUS_203.35",
+     "file": 2848936,
+     "len": 1144
+    },
+    {
+     "vu": 1408,
+     "from_file": "SLUS_203.35",
+     "file": 2827640,
+     "len": 1736
+    },
+    {
+     "vu": 3144,
+     "from_file": "SLUS_203.35",
+     "file": 2957936,
+     "len": 312
+    },
+    {
+     "vu": 3456,
+     "from_file": "SLUS_203.35",
+     "file": 2958256,
+     "len": 2048
+    },
+    {
+     "vu": 5504,
+     "from_file": "SLUS_203.35",
+     "file": 2960312,
+     "len": 2048
+    },
+    {
+     "vu": 7552,
+     "from_file": "SLUS_203.35",
+     "file": 2962368,
+     "len": 1192
+    },
+    {
+     "vu": 8744,
+     "from_file": "SLUS_203.35",
+     "file": 2939080,
+     "len": 472
+    },
+    {
+     "vu": 9216,
+     "from_file": "SLUS_203.35",
+     "file": 2878160,
+     "len": 64
+    },
+    {
+     "vu": 11136,
+     "from_file": "SLUS_203.35",
+     "file": 2850120,
+     "len": 2048
+    },
+    {
+     "vu": 13184,
+     "from_file": "SLUS_203.35",
+     "file": 2851352,
+     "len": 88
+    },
+    {
+     "vu": 13272,
+     "from_file": "SLUS_203.35",
+     "file": 2852264,
+     "len": 1880
+    }
+   ],
+   "pcs": [
+    "0000",
+    "0580"
+   ]
+  },
+  {
+   "hash": "57afd10341ca669e",
+   "size": 16384,
+   "sha256": "df8e89357cfbd993463757ea882b01e7e7ce32127b9c614147637a2d5b97b2b6",
+   "pieces": [
+    {
+     "vu": 0,
+     "from_file": "SLUS_203.35",
+     "file": 2845824,
+     "len": 32
+    },
+    {
+     "vu": 128,
+     "from_file": "SLUS_203.35",
+     "file": 2848936,
+     "len": 1144
+    },
+    {
+     "vu": 1408,
+     "from_file": "SLUS_203.35",
+     "file": 2907624,
+     "len": 2048
+    },
+    {
+     "vu": 3456,
+     "from_file": "SLUS_203.35",
+     "file": 2909680,
+     "len": 1752
+    },
+    {
+     "vu": 5208,
+     "from_file": "SLUS_203.35",
+     "file": 2873000,
+     "len": 120
+    },
+    {
+     "vu": 5328,
+     "from_file": "SLUS_203.35",
+     "file": 2935648,
+     "len": 176
+    },
+    {
+     "vu": 5504,
+     "from_file": "SLUS_203.35",
+     "file": 2874472,
+     "len": 160
+    },
+    {
+     "vu": 5664,
+     "from_file": "SLUS_203.35",
+     "file": 2935992,
+     "len": 1888
+    },
+    {
+     "vu": 7552,
+     "from_file": "SLUS_203.35",
+     "file": 2937888,
+     "len": 1664
+    },
+    {
+     "vu": 9216,
+     "from_file": "SLUS_203.35",
+     "file": 2878160,
+     "len": 64
+    },
+    {
+     "vu": 11136,
+     "from_file": "SLUS_203.35",
+     "file": 2850120,
+     "len": 2048
+    },
+    {
+     "vu": 13184,
+     "from_file": "SLUS_203.35",
+     "file": 2851352,
+     "len": 88
+    },
+    {
+     "vu": 13272,
+     "from_file": "SLUS_203.35",
+     "file": 2852264,
+     "len": 1880
+    }
+   ],
+   "pcs": [
+    "0000",
+    "0080",
+    "04d8",
+    "1418",
+    "1090",
+    "0878",
+    "0e08",
+    "0580"
+   ]
+  },
+  {
+   "hash": "60566c557b074fec",
+   "size": 16384,
+   "sha256": "0afcda5ba02872473d026f75a55117db7ae7b3cc0eafc7a00d442115c66f58c3",
+   "pieces": [
+    {
+     "vu": 0,
+     "from_file": "SLUS_203.35",
+     "file": 2845824,
+     "len": 32
+    },
+    {
+     "vu": 128,
+     "from_file": "SLUS_203.35",
+     "file": 2848936,
+     "len": 1144
+    },
+    {
+     "vu": 1408,
+     "from_file": "SLUS_203.35",
+     "file": 2827640,
+     "len": 1736
+    },
+    {
+     "vu": 3144,
+     "from_file": "SLUS_203.35",
+     "file": 2872064,
+     "len": 312
+    },
+    {
+     "vu": 3456,
+     "from_file": "SLUS_203.35",
+     "file": 2872384,
+     "len": 2048
+    },
+    {
+     "vu": 5504,
+     "from_file": "SLUS_203.35",
+     "file": 2874440,
+     "len": 2048
+    },
+    {
+     "vu": 7552,
+     "from_file": "SLUS_203.35",
+     "file": 2876496,
+     "len": 1728
+    },
+    {
+     "vu": 11136,
+     "from_file": "SLUS_203.35",
+     "file": 2850120,
+     "len": 2048
+    },
+    {
+     "vu": 13184,
+     "from_file": "SLUS_203.35",
+     "file": 2851352,
+     "len": 88
+    },
+    {
+     "vu": 13272,
+     "from_file": "SLUS_203.35",
+     "file": 2852264,
+     "len": 1880
+    }
+   ],
+   "pcs": [
+    "0000",
+    "0580"
+   ]
+  },
+  {
+   "hash": "754f502d3e14415d",
+   "size": 16384,
+   "sha256": "caf53496eebd23da9ca482f40d2e1b42e849463968e18591c10aa4341d500fb0",
+   "pieces": [
+    {
+     "vu": 0,
+     "from_file": "SLUS_203.35",
+     "file": 2845824,
+     "len": 32
+    },
+    {
+     "vu": 128,
+     "from_file": "SLUS_203.35",
+     "file": 2848936,
+     "len": 1144
+    },
+    {
+     "vu": 1408,
+     "from_file": "SLUS_203.35",
+     "file": 2827640,
+     "len": 1736
+    },
+    {
+     "vu": 3144,
+     "from_file": "SLUS_203.35",
+     "file": 2957936,
+     "len": 312
+    },
+    {
+     "vu": 3456,
+     "from_file": "SLUS_203.35",
+     "file": 2958256,
+     "len": 2048
+    },
+    {
+     "vu": 5504,
+     "from_file": "SLUS_203.35",
+     "file": 2960312,
+     "len": 2048
+    },
+    {
+     "vu": 7552,
+     "from_file": "SLUS_203.35",
+     "file": 2962368,
+     "len": 1192
+    },
+    {
+     "vu": 8744,
+     "from_file": "SLUS_203.35",
+     "file": 2877688,
+     "len": 536
+    },
+    {
+     "vu": 11136,
+     "from_file": "SLUS_203.35",
+     "file": 2850120,
+     "len": 2048
+    },
+    {
+     "vu": 13184,
+     "from_file": "SLUS_203.35",
+     "file": 2851352,
+     "len": 88
+    },
+    {
+     "vu": 13272,
+     "from_file": "SLUS_203.35",
+     "file": 2852264,
+     "len": 1880
+    }
+   ],
+   "pcs": [
+    "0000",
+    "0580"
+   ]
+  },
+  {
+   "hash": "7fe1cc331fc5d5a4",
+   "size": 16384,
+   "sha256": "9784d54ed933ca92f1d07f7c739543f9823c2e7f819507a9edcaba3f46d949c7",
+   "pieces": [
+    {
+     "vu": 0,
+     "from_file": "SLUS_203.35",
+     "file": 2845824,
+     "len": 32
+    },
+    {
+     "vu": 128,
+     "from_file": "SLUS_203.35",
+     "file": 2848936,
+     "len": 1144
+    },
+    {
+     "vu": 1408,
+     "from_file": "SLUS_203.35",
+     "file": 2907624,
+     "len": 2048
+    },
+    {
+     "vu": 3456,
+     "from_file": "SLUS_203.35",
+     "file": 2909680,
+     "len": 1752
+    },
+    {
+     "vu": 5208,
+     "from_file": "SLUS_203.35",
+     "file": 2990216,
+     "len": 296
+    },
+    {
+     "vu": 5504,
+     "from_file": "SLUS_203.35",
+     "file": 2990520,
+     "len": 168
+    },
+    {
+     "vu": 5672,
+     "from_file": "SLUS_203.35",
+     "file": 2874608,
+     "len": 1880
+    },
+    {
+     "vu": 7552,
+     "from_file": "SLUS_203.35",
+     "file": 2876496,
+     "len": 1728
+    },
+    {
+     "vu": 11136,
+     "from_file": "SLUS_203.35",
+     "file": 2850120,
+     "len": 2048
+    },
+    {
+     "vu": 13184,
+     "from_file": "SLUS_203.35",
+     "file": 2851352,
+     "len": 88
+    },
+    {
+     "vu": 13272,
+     "from_file": "SLUS_203.35",
+     "file": 2852264,
+     "len": 1880
+    }
+   ],
+   "pcs": [
+    "0000",
+    "0080",
+    "04d8",
+    "1418",
+    "0878",
+    "1090",
+    "0e08",
+    "0580"
+   ]
+  },
+  {
+   "hash": "a56478273f862642",
+   "size": 16384,
+   "sha256": "ea42fdbb785d7ff113ce68658f9f30f4abc2fd942788ecd754923a26e63e989f",
+   "pieces": [
+    {
+     "vu": 0,
+     "from_file": "SLUS_203.35",
+     "file": 2845824,
+     "len": 32
+    },
+    {
+     "vu": 128,
+     "from_file": "SLUS_203.35",
+     "file": 2848936,
+     "len": 1144
+    },
+    {
+     "vu": 1408,
+     "from_file": "SLUS_203.35",
+     "file": 2827640,
+     "len": 1736
+    },
+    {
+     "vu": 3144,
+     "from_file": "SLUS_203.35",
+     "file": 2909360,
+     "len": 312
+    },
+    {
+     "vu": 3456,
+     "from_file": "SLUS_203.35",
+     "file": 2909680,
+     "len": 1752
+    },
+    {
+     "vu": 5208,
+     "from_file": "SLUS_203.35",
+     "file": 2882072,
+     "len": 296
+    },
+    {
+     "vu": 5504,
+     "from_file": "SLUS_203.35",
+     "file": 2882376,
+     "len": 2048
+    },
+    {
+     "vu": 7552,
+     "from_file": "SLUS_203.35",
+     "file": 2884432,
+     "len": 1608
+    },
+    {
+     "vu": 9160,
+     "from_file": "SLUS_203.35",
+     "file": 2878104,
+     "len": 120
+    },
+    {
+     "vu": 11136,
+     "from_file": "SLUS_203.35",
+     "file": 2850120,
+     "len": 2048
+    },
+    {
+     "vu": 13184,
+     "from_file": "SLUS_203.35",
+     "file": 2851352,
+     "len": 88
+    },
+    {
+     "vu": 13272,
+     "from_file": "SLUS_203.35",
+     "file": 2852264,
+     "len": 1880
+    }
+   ],
+   "pcs": [
+    "0000",
+    "0580"
+   ]
+  },
+  {
+   "hash": "a6ba0913df716a06",
+   "size": 16384,
+   "sha256": "e60a86865c1f9048d9e1236b7e1bb26ac5e89b3e048f8450cacb7adeb7002efc",
+   "pieces": [
+    {
+     "vu": 0,
+     "from_file": "SLUS_203.35",
+     "file": 2845824,
+     "len": 32
+    },
+    {
+     "vu": 128,
+     "from_file": "SLUS_203.35",
+     "file": 2848936,
+     "len": 1144
+    },
+    {
+     "vu": 1408,
+     "from_file": "SLUS_203.35",
+     "file": 2870328,
+     "len": 2048
+    },
+    {
+     "vu": 3456,
+     "from_file": "SLUS_203.35",
+     "file": 2872384,
+     "len": 2048
+    },
+    {
+     "vu": 5504,
+     "from_file": "SLUS_203.35",
+     "file": 2874440,
+     "len": 2048
+    },
+    {
+     "vu": 7552,
+     "from_file": "SLUS_203.35",
+     "file": 2876496,
+     "len": 1728
+    },
+    {
+     "vu": 11136,
+     "from_file": "SLUS_203.35",
+     "file": 2850120,
+     "len": 2048
+    },
+    {
+     "vu": 13184,
+     "from_file": "SLUS_203.35",
+     "file": 2851352,
+     "len": 88
+    },
+    {
+     "vu": 13272,
+     "from_file": "SLUS_203.35",
+     "file": 2852264,
+     "len": 1880
+    }
+   ],
+   "pcs": [
+    "0000",
+    "0080",
+    "04d8",
+    "2428",
+    "2150",
+    "1e30",
+    "19f0",
+    "1770",
+    "0580"
+   ]
+  },
+  {
+   "hash": "a8f0b48e4c4ff5dd",
+   "size": 16384,
+   "sha256": "188cda9bece30bbaf5cfb72e4d8ab606ef037fdd223f631b1d9faaa58cb3b75a",
+   "pieces": [
+    {
+     "vu": 0,
+     "from_file": "SLUS_203.35",
+     "file": 2845824,
+     "len": 32
+    },
+    {
+     "vu": 128,
+     "from_file": "SLUS_203.35",
+     "file": 2848936,
+     "len": 1144
+    },
+    {
+     "vu": 1408,
+     "from_file": "SLUS_203.35",
+     "file": 2870328,
+     "len": 64
+    },
+    {
+     "vu": 1472,
+     "from_file": "SLUS_203.35",
+     "file": 2956264,
+     "len": 1984
+    },
+    {
+     "vu": 3456,
+     "from_file": "SLUS_203.35",
+     "file": 2958256,
+     "len": 2048
+    },
+    {
+     "vu": 5504,
+     "from_file": "SLUS_203.35",
+     "file": 2960312,
+     "len": 2048
+    },
+    {
+     "vu": 7552,
+     "from_file": "SLUS_203.35",
+     "file": 2962368,
+     "len": 1192
+    },
+    {
+     "vu": 8744,
+     "from_file": "SLUS_203.35",
+     "file": 2877688,
+     "len": 536
+    },
+    {
+     "vu": 11136,
+     "from_file": "SLUS_203.35",
+     "file": 2850120,
+     "len": 2048
+    },
+    {
+     "vu": 13184,
+     "from_file": "SLUS_203.35",
+     "file": 2851352,
+     "len": 88
+    },
+    {
+     "vu": 13272,
+     "from_file": "SLUS_203.35",
+     "file": 2852264,
+     "len": 1880
+    }
+   ],
+   "pcs": [
+    "0000",
+    "0080",
+    "04d8",
+    "0580"
+   ]
+  },
+  {
+   "hash": "b65265ecadaa9295",
+   "size": 16384,
+   "sha256": "36535290f6d5b955420ebefa19cd73480d35a8d909949c4c14053fb9d6752a4d",
+   "pieces": [
+    {
+     "vu": 0,
+     "from_file": "SLUS_203.35",
+     "file": 2845824,
+     "len": 32
+    },
+    {
+     "vu": 128,
+     "from_file": "SLUS_203.35",
+     "file": 2848936,
+     "len": 1144
+    },
+    {
+     "vu": 1408,
+     "from_file": "SLUS_203.35",
+     "file": 2986408,
+     "len": 2048
+    },
+    {
+     "vu": 3456,
+     "from_file": "SLUS_203.35",
+     "file": 2988464,
+     "len": 2048
+    },
+    {
+     "vu": 5504,
+     "from_file": "SLUS_203.35",
+     "file": 2990520,
+     "len": 168
+    },
+    {
+     "vu": 5672,
+     "from_file": "SLUS_203.35",
+     "file": 2874608,
+     "len": 1880
+    },
+    {
+     "vu": 7552,
+     "from_file": "SLUS_203.35",
+     "file": 2876496,
+     "len": 1728
+    },
+    {
+     "vu": 11136,
+     "from_file": "SLUS_203.35",
+     "file": 2850120,
+     "len": 2048
+    },
+    {
+     "vu": 13184,
+     "from_file": "SLUS_203.35",
+     "file": 2851352,
+     "len": 88
+    },
+    {
+     "vu": 13272,
+     "from_file": "SLUS_203.35",
+     "file": 2852264,
+     "len": 1880
+    }
+   ],
+   "pcs": [
+    "0000",
+    "0080",
+    "04d8",
+    "0868",
+    "0580"
+   ]
+  },
+  {
+   "hash": "c7f551566c27d28c",
+   "size": 16384,
+   "sha256": "5c365e2bc3e1d03f7f92d081bdd5ed7d92023caeec85b0df6a6af5bb4210d2e3",
+   "pieces": [
+    {
+     "vu": 0,
+     "from_file": "SLUS_203.35",
+     "file": 2845824,
+     "len": 32
+    },
+    {
+     "vu": 128,
+     "from_file": "SLUS_203.35",
+     "file": 2848936,
+     "len": 1144
+    },
+    {
+     "vu": 1408,
+     "from_file": "SLUS_203.35",
+     "file": 2931720,
+     "len": 2048
+    },
+    {
+     "vu": 3456,
+     "from_file": "SLUS_203.35",
+     "file": 2933776,
+     "len": 2048
+    },
+    {
+     "vu": 5504,
+     "from_file": "SLUS_203.35",
+     "file": 2874472,
+     "len": 160
+    },
+    {
+     "vu": 5664,
+     "from_file": "SLUS_203.35",
+     "file": 2935992,
+     "len": 1888
+    },
+    {
+     "vu": 7552,
+     "from_file": "SLUS_203.35",
+     "file": 2937888,
+     "len": 1664
+    },
+    {
+     "vu": 9216,
+     "from_file": "SLUS_203.35",
+     "file": 2878160,
+     "len": 64
+    },
+    {
+     "vu": 11136,
+     "from_file": "SLUS_203.35",
+     "file": 2850120,
+     "len": 2048
+    },
+    {
+     "vu": 13184,
+     "from_file": "SLUS_203.35",
+     "file": 2851352,
+     "len": 88
+    },
+    {
+     "vu": 13272,
+     "from_file": "SLUS_203.35",
+     "file": 2852264,
+     "len": 1880
+    }
+   ],
+   "pcs": [
+    "0000",
+    "0080",
+    "04d8",
+    "23f0",
+    "0580"
+   ]
+  },
+  {
+   "hash": "d3e60094a9fe644b",
+   "size": 16384,
+   "sha256": "0550773e06069569a650d8426fb2cc14a7ed8717a7312e0f75552e7e51d45e67",
+   "pieces": [
+    {
+     "vu": 0,
+     "from_file": "SLUS_203.35",
+     "file": 2845824,
+     "len": 32
+    },
+    {
+     "vu": 128,
+     "from_file": "SLUS_203.35",
+     "file": 2848936,
+     "len": 1144
+    },
+    {
+     "vu": 1408,
+     "from_file": "SLUS_203.35",
+     "file": 2827640,
+     "len": 1736
+    },
+    {
+     "vu": 3144,
+     "from_file": "SLUS_203.35",
+     "file": 2988144,
+     "len": 312
+    },
+    {
+     "vu": 3456,
+     "from_file": "SLUS_203.35",
+     "file": 2988464,
+     "len": 2048
+    },
+    {
+     "vu": 5504,
+     "from_file": "SLUS_203.35",
+     "file": 2990520,
+     "len": 168
+    },
+    {
+     "vu": 5672,
+     "from_file": "SLUS_203.35",
+     "file": 2874608,
+     "len": 1880
+    },
+    {
+     "vu": 7552,
+     "from_file": "SLUS_203.35",
+     "file": 2876496,
+     "len": 1728
+    },
+    {
+     "vu": 11136,
+     "from_file": "SLUS_203.35",
+     "file": 2850120,
+     "len": 2048
+    },
+    {
+     "vu": 13184,
+     "from_file": "SLUS_203.35",
+     "file": 2851352,
+     "len": 88
+    },
+    {
+     "vu": 13272,
+     "from_file": "SLUS_203.35",
+     "file": 2852264,
+     "len": 1880
+    }
+   ],
+   "pcs": [
+    "0000",
+    "0580"
+   ]
+  },
+  {
+   "hash": "e5dadc08eb45a0f8",
+   "size": 16384,
+   "sha256": "2eeb0099501dfeed41a2420cce658f99548629e7f5b9c2f877bb6f71950a4144",
+   "pieces": [
+    {
+     "vu": 0,
+     "from_file": "SLUS_203.35",
+     "file": 2845824,
+     "len": 32
+    },
+    {
+     "vu": 128,
+     "from_file": "SLUS_203.35",
+     "file": 2848936,
+     "len": 1144
+    },
+    {
+     "vu": 1408,
+     "from_file": "SLUS_203.35",
+     "file": 2826408,
+     "len": 1088
+    },
+    {
+     "vu": 2496,
+     "from_file": "SLUS_203.35",
+     "file": 2871416,
+     "len": 960
+    },
+    {
+     "vu": 3456,
+     "from_file": "SLUS_203.35",
+     "file": 2872384,
+     "len": 2048
+    },
+    {
+     "vu": 5504,
+     "from_file": "SLUS_203.35",
+     "file": 2874440,
+     "len": 2048
+    },
+    {
+     "vu": 7552,
+     "from_file": "SLUS_203.35",
+     "file": 2876496,
+     "len": 1728
+    },
+    {
+     "vu": 11136,
+     "from_file": "SLUS_203.35",
+     "file": 2850120,
+     "len": 2048
+    },
+    {
+     "vu": 13184,
+     "from_file": "SLUS_203.35",
+     "file": 2851352,
+     "len": 88
+    },
+    {
+     "vu": 13272,
+     "from_file": "SLUS_203.35",
+     "file": 2852264,
+     "len": 1880
+    }
+   ],
+   "pcs": [
+    "0000",
+    "0080",
+    "04d8",
+    "0998",
+    "0580"
+   ]
+  },
+  {
+   "hash": "f347c518b5c0307f",
+   "size": 16384,
+   "sha256": "43d6cd8a75052c746036a37e82eff5c377ce127399069a4316bcecf4fc1b30df",
+   "pieces": [
+    {
+     "vu": 0,
+     "from_file": "SLUS_203.35",
+     "file": 2845824,
+     "len": 32
+    },
+    {
+     "vu": 128,
+     "from_file": "SLUS_203.35",
+     "file": 2848936,
+     "len": 1144
+    },
+    {
+     "vu": 1408,
+     "from_file": "SLUS_203.35",
+     "file": 2827640,
+     "len": 1736
+    },
+    {
+     "vu": 3144,
+     "from_file": "SLUS_203.35",
+     "file": 2909360,
+     "len": 312
+    },
+    {
+     "vu": 3456,
+     "from_file": "SLUS_203.35",
+     "file": 2909680,
+     "len": 1752
+    },
+    {
+     "vu": 5208,
+     "from_file": "SLUS_203.35",
+     "file": 2872968,
+     "len": 152
+    },
+    {
+     "vu": 5360,
+     "from_file": "SLUS_203.35",
+     "file": 2874288,
+     "len": 144
+    },
+    {
+     "vu": 5504,
+     "from_file": "SLUS_203.35",
+     "file": 2874440,
+     "len": 2048
+    },
+    {
+     "vu": 7552,
+     "from_file": "SLUS_203.35",
+     "file": 2876496,
+     "len": 1728
+    },
+    {
+     "vu": 11136,
+     "from_file": "SLUS_203.35",
+     "file": 2850120,
+     "len": 2048
+    },
+    {
+     "vu": 13184,
+     "from_file": "SLUS_203.35",
+     "file": 2851352,
+     "len": 88
+    },
+    {
+     "vu": 13272,
+     "from_file": "SLUS_203.35",
+     "file": 2852264,
+     "len": 1880
+    }
+   ],
+   "pcs": [
+    "0000",
+    "0580"
+   ]
+  }
+ ]
+}
