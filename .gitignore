@@ -3,6 +3,7 @@
 # or translate game code), VU1 code snapshots, builds, logs, screenshots.
 /*
 !/.gitignore
+!/README.md
 !/mhrecomp/
 !/launcher/
 
