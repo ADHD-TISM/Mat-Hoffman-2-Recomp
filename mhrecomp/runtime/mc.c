@@ -69,23 +69,24 @@ static int wild(const char *pat, const char *s) {
     return 0;
 }
 
-/* one 64-byte sceMcTblGetDir entry into EE memory */
-static void put_dt(u32 a, time_t t) {
+/* one 64-byte sceMcTblGetDir entry, built in a host buffer */
+static void put_dt(u8 *a, time_t t) {
     struct tm *g = localtime(&t);
     u8 d[8] = { 0, (u8)g->tm_sec, (u8)g->tm_min, (u8)g->tm_hour, (u8)g->tm_mday, (u8)(g->tm_mon + 1), 0, 0 };
     u16 y = (u16)(g->tm_year + 1900); memcpy(d + 6, &y, 2);
-    for (int i = 0; i < 8; i++) mw8(a + i, d[i]);
+    memcpy(a, d, 8);
 }
-static void put_entry(u32 a, const char *name, const struct _stat64 *st, int dir) {
-    for (int i = 0; i < 64; i++) mw8(a + i, 0);
+static void put_entry(u8 *a, const char *name, const struct _stat64 *st, int dir) {
+    memset(a, 0, 64);
     put_dt(a, st ? st->st_ctime : time(NULL));
     put_dt(a + 8, st ? st->st_mtime : time(NULL));
-    mw32(a + 16, dir ? 0 : (u32)(st ? st->st_size : 0));
-    mw16(a + 20, dir ? 0x8427 : 0x8497);          /* exists | readable/writable/executable | dir or file */
-    for (int i = 0; i < 31 && name[i]; i++) mw8(a + 32 + i, (u8)name[i]);
+    u32 size = dir ? 0 : (u32)(st ? st->st_size : 0); memcpy(a + 16, &size, 4);
+    u16 attr = dir ? 0x8427 : 0x8497; memcpy(a + 20, &attr, 2);   /* exists | readable/writable/executable | dir or file */
+    for (int i = 0; i < 31 && name[i]; i++) a[32 + i] = (u8)name[i];
 }
 
-static int get_dir(int port, const char *path, int maxent, u32 table) {
+/* up to maxent entries of a listing into out (maxent * 64 bytes); returns the count */
+static int list_dir(int port, const char *path, int maxent, u8 *out) {
     char dirpart[1024], pat[256];
     const char *sl = strrchr(path, '/');
     if (sl) { size_t l = (size_t)(sl - path); memcpy(dirpart, path, l); dirpart[l] = 0; if (!l) strcpy(dirpart, "/"); snprintf(pat, sizeof pat, "%s", sl + 1); }
@@ -96,11 +97,11 @@ static int get_dir(int port, const char *path, int maxent, u32 table) {
         char hp[2048]; struct _stat64 st;
         snprintf(hp, sizeof hp, "%s\\%s", hd, pat);
         if (_stat64(hp, &st)) return 0;
-        if (maxent > 0) put_entry(table, pat, &st, (st.st_mode & _S_IFDIR) != 0);
+        if (maxent > 0) put_entry(out, pat, &st, (st.st_mode & _S_IFDIR) != 0);
         return 1;
     }
-    if (!root && maxent > n && wild(pat, ".")) put_entry(table + 64 * n++, ".", NULL, 1);
-    if (!root && maxent > n && wild(pat, "..")) put_entry(table + 64 * n++, "..", NULL, 1);
+    if (!root && maxent > n && wild(pat, ".")) put_entry(out + 64 * n++, ".", NULL, 1);
+    if (!root && maxent > n && wild(pat, "..")) put_entry(out + 64 * n++, "..", NULL, 1);
     char q[2100]; snprintf(q, sizeof q, "%s\\*", hd);
     struct _finddata64i32_t f; intptr_t h = _findfirst64i32(q, &f);
     if (h == -1) return n;
@@ -109,9 +110,28 @@ static int get_dir(int port, const char *path, int maxent, u32 table) {
         if (n >= maxent) break;
         char hp[2048]; struct _stat64 st; snprintf(hp, sizeof hp, "%s\\%s", hd, f.name);
         if (_stat64(hp, &st)) continue;
-        put_entry(table + 64 * n++, f.name, &st, (st.st_mode & _S_IFDIR) != 0);
+        put_entry(out + 64 * n++, f.name, &st, (st.st_mode & _S_IFDIR) != 0);
     } while (_findnext64i32(h, &f) == 0);
     _findclose(h);
+    return n;
+}
+
+/* GetDir. flags != 0 is sceMcGetDir's "next" call: it continues the previous
+ * listing of the same path instead of starting again (the old code listed from
+ * the start each time, so a game reading a long directory in steps got the
+ * first entries again and again). */
+static int get_dir(int port, const char *path, int maxent, u32 table, int cont) {
+    static char last[1024]; static int done;
+    if (!cont || strcmp(last, path)) { snprintf(last, sizeof last, "%s", path); done = 0; }
+    if (maxent <= 0) return 0;
+    int want = done + maxent;
+    u8 *buf = malloc((size_t)want * 64);
+    if (!buf) return 0;
+    int got = list_dir(port, path, want, buf);
+    int n = got > done ? got - done : 0;
+    for (int i = 0; i < n * 64; i++) mw8(table + (u32)i, buf[(size_t)done * 64 + (size_t)i]);
+    free(buf);
+    done += n;
     return n;
 }
 
@@ -238,7 +258,7 @@ void mc_rpc(u32 fn, u8 *b) {
         if (p[0] == '/') snprintf(cwd[port], sizeof cwd[port], "%s", p);
         else { char t[1024]; snprintf(t, sizeof t, "%s/%s", strcmp(cwd[port], "/") ? cwd[port] : "", p); snprintf(cwd[port], sizeof cwd[port], "%s", t); }
         r = 0; break; }
-    case 13: r = (rd(b, 0) & 1) ? NOENTRY : get_dir(0, (const char *)b + 20, (int)rd(b, 12), rd(b, 16)); break;   /* GetDir */
+    case 13: r = (rd(b, 0) & 1) ? NOENTRY : get_dir(0, (const char *)b + 20, (int)rd(b, 12), rd(b, 16), rd(b, 8) != 0); break;   /* GetDir; [8] flags: 0 first, 1 next */
     case 14: {   /* SetFileInfo: flags 1 created, 2 modified (host file times), 4 attributes (not kept), 0x10 name */
         int port = (int)rd(b, 0) & 1; u32 flags = rd(b, 8), info = rd(b, 16);
         if ((flags & 3) && info) { char hp[2048]; host_path(port, (const char *)b + 20, hp, sizeof hp); set_times(hp, info, flags & 1, flags & 2); }

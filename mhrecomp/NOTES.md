@@ -125,6 +125,22 @@ previous city's progress); free ride levels too. Found and fixed:
 Developer build with an own clang: set MH2_CLANG. Update tab downloads need a
 GitHub release of ADHD-TISM/Mat-Hoffman-2-Recomp (none yet).
 
+## Saves (2026-11-23)
+Tested on an empty card in work/mctest (run dir with SLUS_203.35, --image):
+- Boot autoload: "Loading data...", reads BASLUS-20335BMX (3412 + 4-byte
+  checksum) and C0 (8088 + 4), probes C1-C8. Works.
+- Road trip start creates both saves; the results screen saves with circle
+  (then X = yes on "overwrite the previously saved data").
+- Round trip: run 1 set two career words (C0 +0x658 = 13, +0x12f8 = 11).
+  After a boot with that card the game's career block at EE 0x8dd914 holds
+  13 and 11 (0 with an empty card), and a run without riding saved them
+  back unchanged.
+- mc.c GetDir: flags != 0 ("next") now continues the previous listing; it
+  used to restart. The game only uses single calls so far.
+Fresh-card route: Start 3600/3900, X every 250 from 4300 to 11800 (the ride
+starts on an X at the challenge screen, ~frame 17300), then up held with X
+and circle taps; results ~25000.
+
 ## Debug aids added
 - `ee_backtrace()` (cdvd.c): return addresses found on the guest stack.
 - `recomp_ee.py --bbtrace ADDR`: logs every block of one function
@@ -135,8 +151,7 @@ GitHub release of ADHD-TISM/Mat-Hoffman-2-Recomp (none yet).
 1. Hand play test by the user (keyboard: arrows, Enter = Start, K/Space = X).
 2. Reach the other 6 road trip cities and the 4 secret levels (Austin,
    Daytona, SF, halfpipe, Hawaii): needs their unlock flags found (only
-   Chicago opens with MH2_UNLOCK); test loading a save and the
-   results-screen save.
+   Chicago opens with MH2_UNLOCK). Saves: done, see Saves.
 3. Codex review findings still open (see memory use-codex-for-reviews): GS
    register reads above 0x12001000 alias the display registers; MSKPATH3 is
    not modelled (not needed so far: the game syncs textures with VIF1
