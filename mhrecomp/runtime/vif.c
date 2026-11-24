@@ -254,7 +254,7 @@ static void start_cmd(vif_t *v, u32 w) {
         if (v->unit == 1) { v->remain = (imm ? imm : 65536) * 4; v->align = 1; v->n_direct++; }
         break;
     default:
-        { static int once[2]; if (!once[v->unit]++) LOG("vif%d: unknown command %08x\n", v->unit, w); }
+        { static int once[3]; if (!once[v->unit]++)   /* units 0, 1 and 2 (the EE-side scan of VIF1) */ LOG("vif%d: unknown command %08x\n", v->unit, w); }
     }
 }
 

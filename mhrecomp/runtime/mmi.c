@@ -90,6 +90,8 @@ void mmi_exec(u32 w) {
         case 0x15: for (k = 0; k < 8; k++) D.sh[k] = sat16(S.sh[k] - T.sh[k]); break;
         case 0x12: D.w[0] = T.w[0]; D.w[1] = S.w[0]; D.w[2] = T.w[1]; D.w[3] = S.w[1]; break;
         case 0x13: D.w[0] = T.w[0]; D.w[1] = T.w[2]; D.w[2] = S.w[0]; D.w[3] = S.w[2]; break;
+        case 0x18: for (k = 0; k < 16; k++) { int v = S.sb[k] + T.sb[k]; D.sb[k] = (s8)(v > 127 ? 127 : v < -128 ? -128 : v); } break;   /* PADDSB */
+        case 0x19: for (k = 0; k < 16; k++) { int v = S.sb[k] - T.sb[k]; D.sb[k] = (s8)(v > 127 ? 127 : v < -128 ? -128 : v); } break;   /* PSUBSB */
         case 0x16: for (k = 0; k < 4; k++) { D.h[2*k] = T.h[k]; D.h[2*k+1] = S.h[k]; } break;
         case 0x17: for (k = 0; k < 4; k++) { D.h[k] = T.h[2*k]; D.h[4+k] = S.h[2*k]; } break;
         case 0x1a: for (k = 0; k < 8; k++) { D.b[2*k] = T.b[k]; D.b[2*k+1] = S.b[k]; } break;
@@ -126,6 +128,17 @@ void mmi_exec(u32 w) {
         case 0x0a: for (k = 0; k < 4; k++) { D.h[2*k] = T.h[k]; D.h[2*k+1] = S.h[4+k]; } break;
         case 0x0c: for (k = 0; k < 2; k++) { s64 m = (s64)S.sw[2*k] * T.sw[2*k]; D.sd[k] = m; ee.lo.sd[k] = sx32((u32)m); ee.hi.sd[k] = sx32((u32)(m >> 32)); } break;
         case 0x0e: D.d[0] = T.d[0]; D.d[1] = S.d[0]; break;
+        case 0x10: case 0x1c: {   /* PMADDH / PMULTH: 8 signed halfword products. Products 0,1,4,5 go to
+                                     LO words 0-3, products 2,3,6,7 to HI words 0-3 (PMADDH adds to what is
+                                     there); rd gets the even products: LO0, HI0, LO2, HI2. Used by fn_002ec470. */
+            for (k = 0; k < 8; k++) {
+                s32 p = (s32)S.sh[k] * (s32)T.sh[k];
+                r128 *acc = (k & 2) ? &ee.hi : &ee.lo;
+                int i = (k & 1) | ((k & 4) >> 1);
+                acc->w[i] = sa == 0x10 ? acc->w[i] + (u32)p : (u32)p;
+            }
+            D.w[0] = ee.lo.w[0]; D.w[1] = ee.hi.w[0]; D.w[2] = ee.lo.w[2]; D.w[3] = ee.hi.w[2];
+            break; }
         case 0x12: D.d[0] = S.d[0] & T.d[0]; D.d[1] = S.d[1] & T.d[1]; break;
         case 0x13: D.d[0] = S.d[0] ^ T.d[0]; D.d[1] = S.d[1] ^ T.d[1]; break;
         case 0x1a: D = T; D.h[0] = T.h[2]; D.h[2] = T.h[0]; D.h[4] = T.h[6]; D.h[6] = T.h[4]; break;

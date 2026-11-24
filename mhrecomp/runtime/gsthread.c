@@ -144,7 +144,70 @@ static void put(u32 type, u32 a, u32 b, const void *data, u32 len) {
 }
 
 void gst_vif1(const u8 *p, u32 nqw) { if (nqw) put(C_VIF1, nqw, 0, p, nqw * 16); }
-void gst_gif(const u8 *p, u32 nqw, int path) { if (nqw) put(C_GIF, nqw, (u32)path, p, nqw * 16); }
+/* Early FINISH. Mat Hoffman 2 ends each frame by sending a GIF path 3 packet
+ * that writes FINISH (A+D, register 0x61), then spins on CSR.FINISH. Waiting
+ * for the graphics thread there means a full drain each frame: the EE and
+ * the graphics stages never overlap (the EE waited ~55 s of ~100 s in Chicago).
+ * Instead the EE counts the FINISH writes it queues on path 3 (a copy of the
+ * GIF tag parse, below) and, when the game spins on one that is queued but not
+ * yet reached, sets the bit at once (gst_take_finish). The GS stage swallows
+ * the post for each FINISH answered that way (gst_finish_reached). Everything
+ * the GS does stays in order; the frames-ahead limit still holds the EE back.
+ * GS_EARLY_FINISH=0 turns it off. */
+static CRITICAL_SECTION fin_cs;
+static int fin_on = -1, fin_pend, fin_credit;
+static u64 n_fin_early;
+static struct { int active, flg; u32 nloop, nreg, loop, reg; u64 regs; } p3;
+static int count_finish(const u8 *p, u32 nqw) {
+    int n = 0;
+    for (u32 i = 0; i < nqw; i++, p += 16) {
+        u64 lo, hi; memcpy(&lo, p, 8); memcpy(&hi, p + 8, 8);
+        if (!p3.active) {
+            p3.nloop = (u32)(lo & 0x7fff); p3.flg = (int)((lo >> 58) & 3);
+            p3.nreg = (u32)((lo >> 60) & 15); if (!p3.nreg) p3.nreg = 16;
+            p3.regs = hi; p3.loop = 0; p3.reg = 0;
+            p3.active = p3.nloop != 0;
+            continue;
+        }
+        if (p3.flg == 0) {
+            if (((p3.regs >> (4 * p3.reg)) & 15) == 0xe && (hi & 0xff) == 0x61) n++;
+            if (++p3.reg >= p3.nreg) { p3.reg = 0; if (++p3.loop >= p3.nloop) p3.active = 0; }
+        } else if (p3.flg == 1) {
+            for (int h = 0; h < 2 && p3.active; h++)
+                if (++p3.reg >= p3.nreg) { p3.reg = 0; if (++p3.loop >= p3.nloop) p3.active = 0; }
+        } else {
+            if (++p3.loop >= p3.nloop) p3.active = 0;     /* IMAGE: nloop qwords */
+        }
+    }
+    return n;
+}
+void gst_gif(const u8 *p, u32 nqw, int path) {
+    if (!nqw) return;
+    if (fin_on && path == 3) {
+        int k = count_finish(p, nqw);
+        if (k) { EnterCriticalSection(&fin_cs); fin_pend += k; LeaveCriticalSection(&fin_cs); }
+    }
+    put(C_GIF, nqw, (u32)path, p, nqw * 16);
+}
+/* EE, spinning on CSR.FINISH: 1 = a queued FINISH was taken, set the bit now */
+int gst_take_finish(void) {
+    if (!g_gs_mt || !fin_on) return 0;
+    int r = 0;
+    EnterCriticalSection(&fin_cs);
+    if (fin_pend > 0) { fin_pend--; fin_credit++; r = 1; n_fin_early++; }
+    LeaveCriticalSection(&fin_cs);
+    return r;
+}
+/* GS stage, at a FINISH write from GIF path `path`: 1 = post it to the EE */
+int gst_finish_reached(int path) {
+    if (!fin_on || path != 3) return 1;
+    int r = 1;
+    EnterCriticalSection(&fin_cs);
+    if (fin_credit > 0) { fin_credit--; r = 0; }
+    else if (fin_pend > 0) fin_pend--;
+    LeaveCriticalSection(&fin_cs);
+    return r;
+}
 void gst_vu1_start(u32 pc) { put(C_VU1, pc, 0, 0, 0); }
 void gst_vif1_reset(void) { put(C_VIF1_RESET, 0, 0, 0, 0); }
 void gst_vif1_reg(u32 off, u32 val) { put(C_VIF1_REG, off, val, 0, 0); }
@@ -159,11 +222,16 @@ void gst_present(const u64 *priv) {
     put(C_PRESENT, (u32)t.QuadPart, (u32)(t.QuadPart >> 32), priv, 0x20 * 8);
 }
 
+static u64 sync_ticks, sync_ticks_late;   /* EE time spent in gst_sync; _late: after frame 6600 */
 void gst_sync(void) {
     if (!g_gs_mt) return;
     n_syncs++;
+    LARGE_INTEGER t0, t1; QueryPerformanceCounter(&t0);
     while (ld(&r1.tail) != r1.head) ee_wait();
     while (split && ld(&r2.tail) != ld(&r2.head)) ee_wait();
+    QueryPerformanceCounter(&t1);
+    sync_ticks += (u64)(t1.QuadPart - t0.QuadPart);
+    if (g_frame > 6600) sync_ticks_late += (u64)(t1.QuadPart - t0.QuadPart);
 }
 
 /* SIGNAL (1) / FINISH (2) bits the GS stage raised: CSR and the GS interrupt, on the EE */
@@ -270,6 +338,8 @@ void gst_init(void) {
     e = getenv("GS_SPLIT");
     split = !(e && *e == '0') && ring_init(&r2);
     { void vu_init(void); vu_init(); }
+    InitializeCriticalSection(&fin_cs);
+    { const char *f = getenv("GS_EARLY_FINISH"); fin_on = !(f && *f == '0'); }
     gsgl_unbind_context();
     g_gs_mt = 1;
     HANDLE t = CreateThread(NULL, 64 << 20, vu_stage, NULL, 0, NULL);
@@ -287,6 +357,10 @@ void gst_stats(void) {
     LOG("gst: %llu commands, %.1f MB queued, %llu waits for room, %llu waits for frames, %llu full syncs\n",
         (unsigned long long)n_cmds, n_bytes / 1048576.0, (unsigned long long)r1.n_waits_full,
         (unsigned long long)n_waits_frames, (unsigned long long)n_syncs);
+    { LARGE_INTEGER f; QueryPerformanceFrequency(&f);
+      LOG("gst: the EE waited %.1f s in full syncs (%.1f s after frame 6600); %llu FINISH answered early%s\n",
+          (double)sync_ticks / f.QuadPart, (double)sync_ticks_late / f.QuadPart, (unsigned long long)n_fin_early,
+          fin_on ? "" : " (GS_EARLY_FINISH=0)"); }
     if (split) LOG("gst: %.1f MB of GIF data passed to the GS stage, %llu waits for room there\n",
         n_fwd_bytes / 1048576.0, (unsigned long long)r2.n_waits_full);
 }

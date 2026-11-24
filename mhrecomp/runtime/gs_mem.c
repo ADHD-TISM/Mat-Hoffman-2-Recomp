@@ -120,6 +120,46 @@ void gs_read_span32(u32 psm, u32 bp, u32 bw, u32 y, u32 n, u32 *out) {
     for (u32 x = 0; x < n; x++) out[x] = *vw(gs_addr32(bp, bw, x, y, z)) & m;
 }
 
+/* Rows of any format: the format switch once per row instead of once per pixel
+ * (T8 / T4 / CT16 texture uploads and decodes were most of the GS stage in a
+ * level: ~23 a frame in Mat Hoffman 2). x wraps at 2048. Values are raw, as
+ * gs_read_pixel returns them and gs_write_pixel takes them. */
+#define A32(z) (gs_addr32(bp, bw, (x0 + i) & 2047, y, (z)))
+void gs_write_row(u32 psm, u32 bp, u32 bw, u32 x0, u32 y, u32 n, const u32 *v) {
+    u32 i;
+    switch (psm) {
+    case PSMCT32: case PSMZ32: case PSMCT24: case PSMZ24: gs_write_span32(psm, bp, bw, x0, y, n, v); return;
+    case PSMCT16: case PSMZ16: for (i = 0; i < n; i++) *vh(gs_addr16(bp, bw, (x0 + i) & 2047, y, 0, psm == PSMZ16)) = (u16)v[i]; return;
+    case PSMCT16S: case PSMZ16S: for (i = 0; i < n; i++) *vh(gs_addr16(bp, bw, (x0 + i) & 2047, y, 1, psm == PSMZ16S)) = (u16)v[i]; return;
+    case PSMT8: for (i = 0; i < n; i++) gs_vram[gs_addr8(bp, bw, (x0 + i) & 2047, y)] = (u8)v[i]; return;
+    case PSMT4:
+        for (i = 0; i < n; i++) {
+            u32 a = gs_addr4(bp, bw, (x0 + i) & 2047, y); u8 *p = &gs_vram[a >> 1];
+            *p = (a & 1) ? (u8)((*p & 0x0f) | (v[i] << 4)) : (u8)((*p & 0xf0) | (v[i] & 15));
+        }
+        return;
+    case PSMT8H: for (i = 0; i < n; i++) { u32 *p = vw(A32(0)); *p = (*p & 0x00ffffffu) | (v[i] << 24); } return;
+    case PSMT4HL: for (i = 0; i < n; i++) { u32 *p = vw(A32(0)); *p = (*p & 0xf0ffffffu) | ((v[i] & 15) << 24); } return;
+    case PSMT4HH: for (i = 0; i < n; i++) { u32 *p = vw(A32(0)); *p = (*p & 0x0fffffffu) | ((v[i] & 15) << 28); } return;
+    }
+}
+void gs_read_row(u32 psm, u32 bp, u32 bw, u32 x0, u32 y, u32 n, u32 *out) {
+    u32 i;
+    switch (psm) {
+    case PSMCT32: case PSMZ32: for (i = 0; i < n; i++) out[i] = *vw(A32(psm == PSMZ32)); return;
+    case PSMCT24: case PSMZ24: for (i = 0; i < n; i++) out[i] = *vw(A32(psm == PSMZ24)) & 0xffffff; return;
+    case PSMCT16: case PSMZ16: for (i = 0; i < n; i++) out[i] = *vh(gs_addr16(bp, bw, (x0 + i) & 2047, y, 0, psm == PSMZ16)); return;
+    case PSMCT16S: case PSMZ16S: for (i = 0; i < n; i++) out[i] = *vh(gs_addr16(bp, bw, (x0 + i) & 2047, y, 1, psm == PSMZ16S)); return;
+    case PSMT8: for (i = 0; i < n; i++) out[i] = gs_vram[gs_addr8(bp, bw, (x0 + i) & 2047, y)]; return;
+    case PSMT4: for (i = 0; i < n; i++) { u32 a = gs_addr4(bp, bw, (x0 + i) & 2047, y); out[i] = (gs_vram[a >> 1] >> ((a & 1) * 4)) & 15; } return;
+    case PSMT8H: for (i = 0; i < n; i++) out[i] = *vw(A32(0)) >> 24; return;
+    case PSMT4HL: for (i = 0; i < n; i++) out[i] = (*vw(A32(0)) >> 24) & 15; return;
+    case PSMT4HH: for (i = 0; i < n; i++) out[i] = *vw(A32(0)) >> 28; return;
+    }
+    for (i = 0; i < n; i++) out[i] = 0;
+}
+#undef A32
+
 int gs_psm_bpp(u32 psm) {
     switch (psm) {
     case PSMCT32: case PSMZ32: case PSMCT24: case PSMZ24: case PSMT8H: case PSMT4HL: case PSMT4HH: return 32;

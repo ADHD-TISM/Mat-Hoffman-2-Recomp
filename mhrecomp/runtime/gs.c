@@ -141,16 +141,12 @@ void gs_decode_texture(const gs_draw_state *s, u32 *out) {
         }
         return;
     }
-    for (u32 y = 0; y < h; y++)
-        for (u32 x = 0; x < w; x++) {
-            u32 v = gs_read_pixel(psm, bp, bw, x, y), c;
-            if (pal) c = lut[v & 255];
-            else if (psm == PSMCT32) c = v;
-            else if (psm == PSMCT24 || psm == PSMZ24) c = exp24(v, s);
-            else if (psm == PSMZ32) c = v;
-            else c = exp16(v, s);
-            out[y * w + x] = c;
-        }
+    for (u32 y = 0; y < h; y++) {
+        u32 *row = out + y * w;
+        gs_read_row(psm, bp, bw, 0, y, w, row);         /* raw values, then expanded in place */
+        if (pal) for (u32 x = 0; x < w; x++) row[x] = lut[row[x] & 255];
+        else for (u32 x = 0; x < w; x++) row[x] = exp16(row[x], s);
+    }
 }
 u32 gs_clut_hash(void) { return clut_hash; }
 
@@ -191,12 +187,23 @@ static void xfer_data(const u8 *p, u32 bytes) {
         for (; i < npx && xfer.active; i++) { u32 v; memcpy(&v, p + 4 * i, 4); xfer_put(v); }
         return;
     }
+    /* 24/16/8/4 bits: unpack up to the end of the row, then write the row at once */
+    u32 tmp[2048], n = 0, mask = (u32)((1ull << bpp) - 1);
     for (u32 i = 0; i < bytes && xfer.active; i++) {
         xfer.bits |= (u64)p[i] << xfer.nbits; xfer.nbits += 8;
         while (xfer.nbits >= bpp && xfer.active) {
-            xfer_put((u32)(xfer.bits & ((1ull << bpp) - 1)));
+            tmp[n++] = (u32)xfer.bits & mask;
             xfer.bits >>= bpp; xfer.nbits -= bpp;
+            if (n == 2048 || xfer.x + n >= xfer.w) {
+                gs_write_row(xfer.psm, xfer.bp, xfer.bw, (xfer.sx + xfer.x) & 2047, (xfer.sy + xfer.y) & 2047, n, tmp);
+                n_xfer_px += n; xfer.x += n; n = 0;
+                if (xfer.x >= xfer.w) { xfer.x = 0; if (++xfer.y >= xfer.h) xfer_done(); }
+            }
         }
+    }
+    if (n) {
+        gs_write_row(xfer.psm, xfer.bp, xfer.bw, (xfer.sx + xfer.x) & 2047, (xfer.sy + xfer.y) & 2047, n, tmp);
+        n_xfer_px += n; xfer.x += n;
     }
 }
 
@@ -210,10 +217,8 @@ static void local_to_local(void) {
     gs_rect_blocks(dpsm, dbp, dbw, dsx, dsy, w, h, &b0, &b1);
     gsgl_sync_vram(b0, b1);
     u32 *tmp = malloc((size_t)w * h * 4 + 4);
-    for (u32 y = 0; y < h; y++) for (u32 x = 0; x < w; x++)
-        tmp[y * w + x] = gs_read_pixel(spsm, sbp, sbw, (ssx + x) & 2047, (ssy + y) & 2047);
-    for (u32 y = 0; y < h; y++) for (u32 x = 0; x < w; x++)
-        gs_write_pixel(dpsm, dbp, dbw, (dsx + x) & 2047, (dsy + y) & 2047, tmp[y * w + x]);
+    for (u32 y = 0; y < h; y++) gs_read_row(spsm, sbp, sbw, ssx, (ssy + y) & 2047, w, tmp + y * w);
+    for (u32 y = 0; y < h; y++) gs_write_row(dpsm, dbp, dbw, dsx, (dsy + y) & 2047, w, tmp + y * w);
     free(tmp);
     gsgl_vram_written(dpsm, dbp, dbw, dsx, dsy, w, h);
     if (g_log_gs) LOG("gs: local->local %ux%u %x(%x) -> %x(%x)\n", w, h, sbp, spsm, dbp, dpsm);
@@ -441,6 +446,7 @@ static void vertex_kick(u32 x, u32 y, u32 z, u32 f, int kick) {
 }
 
 /* ---- register writes ----------------------------------------------------- */
+static int gif_cur_path;   /* GIF path of the packet being parsed (gif_transfer), for early FINISH */
 static void gs_write_reg(u32 r, u64 v) {
     r &= 0x7f;
     if (r != RGBAQ && r != ST && r != UV && r != XYZF2 && r != XYZF3 && r != XYZ2 && r != XYZ3 && r != FOG) st_gen++;
@@ -468,7 +474,11 @@ static void gs_write_reg(u32 r, u64 v) {
         return;
     case FINISH:
         gsgl_flush();
-        if (g_gs_mt) { gst_post_csr(2); return; }
+        if (g_gs_mt) {
+            int gst_finish_reached(int path);
+            if (gst_finish_reached(gif_cur_path)) gst_post_csr(2);   /* else the EE already set it (early FINISH) */
+            return;
+        }
         gs_csr |= 2;
         if (!(gs_imr & 0x200)) intc_raise(0);
         return;
@@ -516,6 +526,7 @@ void gif_transfer(const u8 *p, u32 nqw, int path) {
         if (g_on_vu_stage) { gst2_gif(p, nqw, path); return; }
     }
     gif_path *g = &gp[path & 3];
+    gif_cur_path = path & 3;
     n_gif_qw += nqw;
     for (u32 i = 0; i < nqw; i++, p += 16) {
         if (!g->active) {

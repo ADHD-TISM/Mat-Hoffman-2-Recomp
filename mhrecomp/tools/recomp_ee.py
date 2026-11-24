@@ -245,6 +245,8 @@ def plausible_start(exe, t):
     if w is None or not valid(Insn(t, w)): return False
     if t == exe.text[0]: return True
     if exe.word(t - 8) == 0x03e00008: return True
+    v = exe.word(t - 8)
+    if v is not None and (v >> 26) == 2: return True     # after a tail jump `j fn; <delay>`
     if (w >> 16) in (0x27bd, 0x67bd) and (w & 0x8000): return True
     # after zero padding that follows a `jr ra` or a `j` (C++ thunks: `j fn; nop`
     # padded to 16 bytes, reached only through vtables)
@@ -266,7 +268,13 @@ def discover(exe, extra):
     swept = set()
     a = exe.text[0] + 8
     while a < exe.text[1]:
-        if exe.word(a - 8) == 0x03e00008:
+        # a function ends with `jr ra` or with a `j` tail jump (+ delay slot); what
+        # follows is the next function. Without the `j` case 64 functions reached only
+        # through pointers were missing or existed only as labels inside the function
+        # before them ("call to unknown address" in play). A `j` in the middle of a
+        # function gives a spare entry, which is harmless (WEAK below).
+        pw = exe.word(a - 8)
+        if pw == 0x03e00008 or (pw is not None and (pw >> 26) == 2):
             t = a
             while exe.word(t) == 0 and t < exe.text[1] - 4: t += 4
             w = exe.word(t)
@@ -450,7 +458,7 @@ def cond(i):
 # functions that start with a call to the runtime's ee_hook(addr) (runtime/main.c),
 # which may adjust their arguments or run the body itself (a nonzero return skips it):
 # 0x11dfd0 camera aspect setter, 0x101068 view frustum builder (both widescreen)
-HOOKS = set()
+HOOKS = {0x00125040}   # main.c ee_hook: MH2_UNLOCK fame table
 
 def callexpr(t, entries):
     if t in entries: return f'f_{t:08x}();'

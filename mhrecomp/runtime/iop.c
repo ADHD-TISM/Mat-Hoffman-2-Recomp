@@ -213,8 +213,10 @@ static void start_thread(int i, u32 a0, u32 a1) {
 static void gstr(u32 a, char *out, int max) {
     int k = 0; for (; k < max - 1; k++) { char c = (char)ir8(a + k); if (!c) break; out[k] = c; } out[k] = 0;
 }
-static void guest_printf(u32 fmt_addr, int first_arg) {
-    char fmt[512], out[1024]; gstr(fmt_addr, fmt, sizeof fmt);
+/* format a guest printf call into out[1024]; returns the length */
+static int guest_format(u32 fmt_addr, int first_arg, char *out_buf) {
+    char fmt[512]; gstr(fmt_addr, fmt, sizeof fmt);
+    char out[1024];
     int n = 0, arg = first_arg;
     for (const char *p = fmt; *p && n < 1000; p++) {
         if (*p != '%') { out[n++] = *p; continue; }
@@ -228,8 +230,15 @@ static void guest_printf(u32 fmt_addr, int first_arg) {
         if (*p == 's') { char str[256]; gstr(v, str, sizeof str); n += snprintf(out + n, sizeof out - n, spec, str); }
         else if (strchr("dixXucp", *p)) n += snprintf(out + n, sizeof out - n, spec, v);
         else out[n++] = '?';
+        if (n > 1000) n = 1000;   /* snprintf returns the wanted length, not the written one */
+        if (n < 0) n = 0;         /* ... or -1 for a bad conversion */
     }
     out[n < 1023 ? n : 1023] = 0;
+    memcpy(out_buf, out, 1024);
+    return n < 1023 ? n : 1023;
+}
+static void guest_printf(u32 fmt_addr, int first_arg) {
+    char out[1024]; guest_format(fmt_addr, first_arg, out);
     LOG("iop> %s", out);
 }
 
@@ -440,6 +449,10 @@ void iop_import(const char *lib, int idx) {
         switch (idx) {
         case 12: for (u32 k = 0; k < A2; k++) iw8(A0 + k, ir8(A1 + k)); IR[2] = A0; return;
         case 14: for (u32 k = 0; k < A2; k++) iw8(A0 + k, (u8)A1); IR[2] = A0; return;
+        case 19: {   /* sprintf(dst, fmt, ...): PS2SOUND.IRX imports it; was missing (returned 0, buffer untouched) */
+            char out[1024]; u32 dst = A0; int n = guest_format(A1, 2, out);
+            for (int k = 0; k <= n; k++) iw8(dst + (u32)k, (u8)out[k]);
+            IR[2] = (u32)n; return; }
         case 20: { u32 d = A0; while (ir8(d)) d++; u32 s = A1; u8 c; do { c = ir8(s++); iw8(d++, c); } while (c); IR[2] = A0; return; }
         case 22: { u32 a = A0, b = A1; for (;;) { u8 x = ir8(a++), y = ir8(b++); if (x != y) { IR[2] = (u32)((int)x - (int)y); return; } if (!x) { IR[2] = 0; return; } } }
         case 23: { u32 d = A0, s = A1; u8 c; do { c = ir8(s++); iw8(d++, c); } while (c); IR[2] = A0; return; }

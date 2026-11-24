@@ -264,8 +264,8 @@ static u32 io_read32_raw(u32 a) {
 u64 n_poll_skips, n_poll_skipped_cycles;
 static inline int pollable(u32 pa) {
     if (pa >= 0x10000000 && pa < 0x10003000) return 0;     /* timers, IPU */
-    /* CSR while the graphics thread works: FINISH may still come from it, so keep polling */
-    return (pa >= 0x10003000 && pa < 0x10010000) || (pa == 0x12001000 && !gst_busy());
+    /* GS CSR has its own rule in io_read32 (it depends on the graphics thread) */
+    return pa >= 0x10003000 && pa < 0x10010000;
 }
 u32 io_read32(u32 a) {
     u32 v = io_read32_raw(a), pa = a & 0x1fffffff;
@@ -281,7 +281,26 @@ u32 io_read32(u32 a) {
            (Mat Hoffman 2 does at every frame end). Wait for the thread here instead of
            burning emulated time: a slow host then no longer stretches the game's frames
            over many vblanks, and runs are repeatable. */
-        if (++reps >= 4) { gst_sync(); v = io_read32_raw(a); reps = 0; }
+        /* Always the same steps, whatever the thread was doing: drain it, read
+           again, and only if nothing changed jump to the next event. (Skipping
+           only when the thread happened to be idle made emulated time depend on
+           host speed, so scripted runs drifted apart.) */
+        if (++reps >= 4) {
+            int gst_take_finish(void);
+            reps = 0;
+            if (!(v & 2) && gst_take_finish()) {     /* the FINISH it waits for is queued: answer now (gsthread.c) */
+                gs_csr |= 2;
+                if (!(gs_imr & 0x200)) intc_raise(0);
+                last_pa = pa; last_v = v = io_read32_raw(a); last_cyc = ee.cycles;
+                return v;
+            }
+            gst_sync(); u32 v2 = io_read32_raw(a);
+            if (v2 == v && ee.next_event > ee.cycles) {
+                n_poll_skips++; n_poll_skipped_cycles += ee.next_event - ee.cycles;
+                ee.cycles = ee.next_event;
+            }
+            v = v2;
+        }
     } else reps = 0;
     last_pa = pa; last_v = v; last_cyc = ee.cycles;
     return v;

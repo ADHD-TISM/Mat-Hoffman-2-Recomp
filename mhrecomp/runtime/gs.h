@@ -21,6 +21,8 @@ u32 gs_addr8(u32 bp, u32 bw, u32 x, u32 y);
 u32 gs_addr4(u32 bp, u32 bw, u32 x, u32 y);
 u32 gs_read_pixel(u32 psm, u32 bp, u32 bw, u32 x, u32 y);
 void gs_write_pixel(u32 psm, u32 bp, u32 bw, u32 x, u32 y, u32 v);
+void gs_write_row(u32 psm, u32 bp, u32 bw, u32 x0, u32 y, u32 n, const u32 *v);   /* gs_mem.c: n raw pixels of one row */
+void gs_read_row(u32 psm, u32 bp, u32 bw, u32 x0, u32 y, u32 n, u32 *out);
 void gs_write_row32(u32 psm, u32 bp, u32 bw, u32 y, u32 w, const u32 *v);
 int gs_psm_span32(u32 psm);
 void gs_write_span32(u32 psm, u32 bp, u32 bw, u32 x0, u32 y, u32 n, const u32 *v);

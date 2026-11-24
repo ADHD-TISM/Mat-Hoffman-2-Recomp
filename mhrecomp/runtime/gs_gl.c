@@ -449,14 +449,15 @@ static void target_upload(target *t, u32 x0, u32 y0, u32 w, u32 h) {
     if (x0 + w > t->w) w = t->w - x0;
     if (!w || !h) return;
     u32 *pix = malloc((size_t)w * h * 4);
-    for (u32 y = 0; y < h; y++)
-        for (u32 x = 0; x < w; x++) {
-            u32 v = gs_read_pixel(t->psm, t->fbp, t->fbw, x0 + x, y0 + y), c;
-            if (t->psm == PSMCT16 || t->psm == PSMCT16S)
-                c = ((v & 31) << 3) | (((v >> 5) & 31) << 11) | (((v >> 10) & 31) << 19) | ((v & 0x8000) ? 0x80000000u : 0);
-            else c = v;
-            pix[y * w + x] = c;
+    int c16 = t->psm == PSMCT16 || t->psm == PSMCT16S;
+    for (u32 y = 0; y < h; y++) {
+        u32 *row = pix + y * w;
+        gs_read_row(t->psm, t->fbp, t->fbw, x0, y0 + y, w, row);
+        if (c16) for (u32 x = 0; x < w; x++) {
+            u32 v = row[x];
+            row[x] = ((v & 31) << 3) | (((v >> 5) & 31) << 11) | (((v >> 10) & 31) << 19) | ((v & 0x8000) ? 0x80000000u : 0);
         }
+    }
     blit_rgba(t, x0, y0, w, h, pix);
     free(pix);
 }
@@ -498,10 +499,13 @@ static void target_download_rows(target *t, u32 pr0, u32 pr1) {
         for (u32 y = 0; y < h; y++) {
             const u32 *row = pix + (size_t)y * w;
             if (!s16) gs_write_row32(t->psm, t->fbp, t->fbw, y0 + y, w, row);
-            else for (u32 x = 0; x < w; x++) {
-                u32 c = row[x];
-                gs_write_pixel(t->psm, t->fbp, t->fbw, x, y0 + y,
-                               ((c >> 3) & 31) | (((c >> 11) & 31) << 5) | (((c >> 19) & 31) << 10) | ((c >> 31) << 15));
+            else {
+                u32 tmp[2048], n = w > 2048 ? 2048 : w;
+                for (u32 x = 0; x < n; x++) {
+                    u32 c = row[x];
+                    tmp[x] = ((c >> 3) & 31) | (((c >> 11) & 31) << 5) | (((c >> 19) & 31) << 10) | ((c >> 31) << 15);
+                }
+                gs_write_row(t->psm, t->fbp, t->fbw, 0, y0 + y, n, tmp);
             }
         }
         free(pix);
@@ -596,10 +600,30 @@ typedef struct {
     int used;
     u32 tbp, tbw, tpsm, tw, th, cbp, cpsm, csa, clut_hash, ta0, ta1, aem;
     u32 gen; u64 stamp;
+    u64 vhash;                     /* hash of the local memory blocks it was decoded from (0 = none) */
     GLuint tex;
 } tcache;
 static tcache tc[NTC];
-static u64 tc_clock, n_decodes;
+static u64 tc_clock, n_decodes, n_same_content;
+
+/* Mat Hoffman 2 uploads its textures again every frame (one per VIF1
+ * interrupt), mostly with the same bytes: the page generation then changes
+ * but the content does not. Hashing the blocks (a linear read) is much
+ * cheaper than the swizzled decode and the GL upload it saves. */
+static u64 vram_hash(u32 b0, u32 b1) {
+    if (b1 < b0 || (u64)(b1 - b0 + 1) * 256 > (1u << 20)) return 0;
+    const u64 *p = (const u64 *)(gs_vram + (size_t)(b0 & 16383) * 256);
+    size_t n = (size_t)(b1 - b0 + 1) * 32;
+    if ((b0 & 16383) * 256 + n * 8 > GS_VRAM_SIZE) return 0;
+    u64 h = 0x9e3779b97f4a7c15ull ^ ((u64)b0 << 32 | b1);
+    for (size_t i = 0; i < n; i += 4) {
+        h = (h ^ p[i]) * 0xff51afd7ed558ccdull; h ^= h >> 29;
+        h += p[i + 1] * 0xc4ceb9fe1a85ec53ull;
+        h = (h ^ p[i + 2]) * 0x9e3779b97f4a7c15ull; h ^= h >> 31;
+        h += p[i + 3];
+    }
+    return h | 1;
+}
 
 static void sync_for_texture(u32 b0, u32 b1);
 #define TC_KEY_EQ(e, s) ((e)->tbp == (s)->tbp && (e)->tbw == (s)->tbw && (e)->tpsm == (s)->tpsm && (e)->tw == (s)->tw && \
@@ -641,6 +665,12 @@ static GLuint texture_from_memory(const gs_draw_state *s) {
     tc_hint[hk] = (u16)(old - tc);
 decode:;
     tcache *e = old;
+    u64 vh = vram_hash(b0, b1);
+    if (vh && e->used && e->vhash == vh && TC_KEY_EQ(e, s)) {   /* uploaded again, same bytes */
+        e->gen = g; n_same_content++;
+        return e->tex;
+    }
+    e->vhash = vh;
     u32 w = 1u << s->tw, h = 1u << s->th;
     if (!e->used || e->tw != s->tw || e->th != s->th) {
         if (e->used) glDeleteTextures(1, &e->tex);
@@ -1424,9 +1454,10 @@ void gsgl_bind_context(void) { if (!wglMakeCurrent(dc, glrc)) LOG("gs: cannot ma
 double gsgl_swap_wait_ms(void) { return swap_wait_ms; }
 
 void gsgl_stats(void) {
-    LOG("gs: %llu batches, %llu vertices, %llu targets made, %llu downloads (%llu page rows), %llu texture decodes, %llu batches off screen\n",
+    LOG("gs: %llu batches, %llu vertices, %llu targets made, %llu downloads (%llu page rows), %llu texture decodes (%llu skipped: same bytes), %llu batches off screen\n",
         (unsigned long long)n_batches, (unsigned long long)n_draw_verts, (unsigned long long)n_targets_made,
-        (unsigned long long)n_downloads, (unsigned long long)n_dl_rows, (unsigned long long)n_decodes, (unsigned long long)n_culled);
+        (unsigned long long)n_downloads, (unsigned long long)n_dl_rows, (unsigned long long)n_decodes,
+        (unsigned long long)n_same_content, (unsigned long long)n_culled);
     LOG("gs: %llu texture reads used an earlier write-back, %llu async read-backs\n", (unsigned long long)n_sync_skipped, (unsigned long long)n_async_reads);
     LOG("gs: %llu mipmapped batches, %llu of them never reach level 0 (not decoded)\n", (unsigned long long)n_mip_batches, (unsigned long long)n_mip_skip0);
     if (n_presents) LOG("gs: %llu presents, %llu gaps over 20 ms (%llu after frame 6600, longest %.1f ms there)\n",

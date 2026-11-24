@@ -90,7 +90,38 @@ and starts it with `--image <iso> <game folder>`. Root = the repository folder;
 the disc image goes in `Mat Hoffman 2/` or is chosen on the Build tab.
 `sh launcher/build_exe.sh` makes `Mat Hoffman 2 Launcher.exe` (PyInstaller).
 After recording new VU1 programs: `python -I tools/mkvurecipe.py gen_vu
-vu_recipe.json ../disc/SLUS_203.35` (all 22 programs are inside the ELF).
+vu_recipe.json ../disc/SLUS_203.35` (all programs so far are inside the ELF).
+
+## Speed (2026-11-23, third session)
+Real time in Chicago, no window: 2389 frames over 17 ms and 347 audio
+underruns -> 45 and 10. Three changes:
+- Early FINISH (gsthread.c, hw.c): the game ends each frame with a GIF path 3
+  packet writing FINISH and spins on CSR. That spin used to drain both
+  graphics stages (gst_sync): the EE waited 55 s of ~100 s. The EE now counts
+  the FINISH writes it queues on path 3 and answers the spin at once; the GS
+  stage swallows its own post for those. GS_EARLY_FINISH=0 turns it off. The
+  EE may now run up to the frames-ahead limit (2) ahead of the screen.
+- Texture cache (gs_gl.c): the game uploads its textures again every frame
+  with the same bytes. A hash of the source blocks skips the decode and the
+  GL upload when unchanged (214k decodes -> 11k on the Chicago route).
+- Row functions gs_read_row / gs_write_row (gs_mem.c) for T4/T8/CT16:
+  uploads, decodes, local->local and target uploads no longer call the
+  per-pixel functions (output checked identical, 16 frames).
+- hw.c: the CSR spin rule no longer depends on whether the graphics thread is
+  idle (it made scripted runs drift with host speed); two runs now match.
+
+## Level crawl (2026-11-23)
+`MH2_UNLOCK=1` (testing only; hook on fn 125040 in main.c) zeroes the fame
+each road trip city needs. Route to Chicago: Start at 1700/1900/2100, X at
+2600/2800 (road trip, rider), `right` at 3100, X every 200 frames from 3500,
+`up` from 9100. Other cities stay locked on a fresh save (they need the
+previous city's progress); free ride levels too. Found and fixed:
+- recomp_ee.py: C++ thunks reached only through vtables (`j fn; nop`
+  padded) and an empty `jr ra` right after a tail jump are entries now (42
+  were missing; Session/Free ride crashed at 0x119a40, Chicago at 0x3232a0).
+- 18 more VU1 programs (40 in gen_vu). vu.c takes ~8 min to compile now.
+- Known, harmless so far: "vif1: unknown command ad6bad6b" once, at X on
+  the results screen (also before these changes); libmtap version warning.
 Developer build with an own clang: set MH2_CLANG. Update tab downloads need a
 GitHub release of ADHD-TISM/Mat-Hoffman-2-Recomp (none yet).
 
@@ -102,15 +133,18 @@ GitHub release of ADHD-TISM/Mat-Hoffman-2-Recomp (none yet).
 
 ## Next steps
 1. Hand play test by the user (keyboard: arrows, Enter = Start, K/Space = X).
-2. Crawl the other levels and modes for missing EE entries and new VU1
-   programs; test loading a save and the results-screen save.
+2. Reach the other 6 road trip cities and the 4 secret levels (Austin,
+   Daytona, SF, halfpipe, Hawaii): needs their unlock flags found (only
+   Chicago opens with MH2_UNLOCK); test loading a save and the
+   results-screen save.
 3. Codex review findings still open (see memory use-codex-for-reviews): GS
    register reads above 0x12001000 alias the display registers; MSKPATH3 is
    not modelled (not needed so far: the game syncs textures with VIF1
    interrupts); cdvd.c image-type detection by size.
 4. Leftovers from the old game: skip_intro movie names in pad.c, menu.c texts,
-   widescreen hooks. Two VU1 programs seen in the level are still interpreted
-   (f75b7e19549cb6fd, aaba90026769be9d): record and add them.
+   widescreen hooks.
+5. vu.c compile time (~8 min with 40 programs) makes the launcher's first
+   build slow: split vu1_rec.h into its own files compiled in parallel.
 6. Known game names: 1dd4b0 fopen, 1dd6a0 fread, 1dd380 file table entry,
    1dd540 CD read, 36b940 snprintf, 36a950 printf core, 3a0d00 strlen,
    22ff60 end of frame / swap, 230870 display registers, 20f370 pad poll.

@@ -133,7 +133,12 @@ void ee_bb(u32 a) {
     LOG("bb %08x v0 %08x v1 %08x a0 %08x a1 %08x s0 %08x s1 %08x sp %08x\n", a, GW(2), GW(3), GW(4), GW(5), GW(16), GW(17), GW(29));
 }
 
+/* MH2_UNLOCK=1 (testing): fn 125040 reads global\famePoints.txt, the fame each
+ * road trip city needs, into its object at +732..+760 (8 words). The hook
+ * remembers the object; check_frame_limit zeroes those words every frame. */
+static u32 fame_obj;
 int ee_hook(u32 a) {
+    if (a == 0x00125040u) { fame_obj = GW(4); LOG("unlock: fame table at %08x\n", fame_obj); return 0; }
     LOG("hook %08x: a0 %08x a1 %08x a2 %08x a3 %08x ra %08x\n", a, GW(4), GW(5), GW(6), GW(7), GW(31));
     return 0;
 }
@@ -141,6 +146,8 @@ int ee_hook(u32 a) {
 static void on_exit_report(void) { trace_dump(); fflush(stdout); fflush(stderr); }
 
 void check_frame_limit(void) {
+    static int unlock = -1; if (unlock < 0) unlock = getenv("MH2_UNLOCK") != 0;
+    if (unlock && fame_obj) for (int k = 0; k < 8; k++) mw32(fame_obj + 732 + 4 * k, 0);
     if (max_frames && g_frame >= max_frames) {
         extern void kernel_dump(void);
         LOG("frame limit reached\n"); kernel_dump(); ipu_stats();
