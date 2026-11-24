@@ -14,9 +14,9 @@ compile() {
 }
 export -f compile 2>/dev/null || true
 export CC CFLAGS
-ls gen/*.c gen_iop/*.c runtime/*.c | xargs -P 16 -I{} sh -c '
+ls gen/*.c gen_iop/*.c gen_vu/*.c runtime/*.c | xargs -P 16 -I{} sh -c '
   src={}; obj=build/obj/$(echo "$src" | tr "/" "_" | sed "s/\.c$/.o/")
-  if [ ! -f "$obj" ] || [ "$src" -nt "$obj" ] || [ runtime/ee.h -nt "$obj" ] || [ runtime/rt.h -nt "$obj" ] || [ runtime/iop.h -nt "$obj" ] || { case "$src" in runtime/*) [ runtime/config.h -nt "$obj" ] || [ runtime/gs.h -nt "$obj" ];; *) false;; esac; } || { [ "$src" = runtime/vu.c ] && [ -f gen_vu/vu1_rec.h ] && [ gen_vu/vu1_rec.h -nt "$obj" ]; }; then
+  if [ ! -f "$obj" ] || [ "$src" -nt "$obj" ] || [ runtime/ee.h -nt "$obj" ] || [ runtime/rt.h -nt "$obj" ] || [ runtime/iop.h -nt "$obj" ] || { case "$src" in runtime/*) [ runtime/config.h -nt "$obj" ] || [ runtime/gs.h -nt "$obj" ];; *) false;; esac; } || { [ "$src" = runtime/vu.c ] && [ -f gen_vu/vu1_rec.h ] && [ gen_vu/vu1_rec.h -nt "$obj" ]; } || { case "$src" in runtime/vu.c|gen_vu/*) [ runtime/vu_core.h -nt "$obj" ];; *) false;; esac; }; then
     $CC $CFLAGS -c "$src" -o "$obj" || exit 255
   fi'
 $CC -g build/obj/*.o -o build/mh2.exe -Wl,--stack,67108864 -lwinmm -lgdi32 -luser32 -lopengl32

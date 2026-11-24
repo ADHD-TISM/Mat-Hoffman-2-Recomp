@@ -39,7 +39,7 @@ from concurrent.futures import ThreadPoolExecutor
 # The project's online home (GitHub "owner/name"). Empty while it is not published:
 # the launcher then uses the mhrecomp folder next to it and Update says so.
 REPO = "ADHD-TISM/Mat-Hoffman-2-Recomp"
-LAUNCHER_VERSION = "1"
+LAUNCHER_VERSION = "2"
 
 GAME_NAME = "Mat Hoffman's Pro BMX 2"
 GAME_SERIAL = "SLUS-20335"
@@ -685,6 +685,7 @@ def _sources(P):
     src = [os.path.join(rt, n) for n in sorted(os.listdir(rt)) if n.endswith(".c")]
     src += [os.path.join(P.gen, n) for n in sorted(os.listdir(P.gen)) if n.endswith(".c")]
     src += [os.path.join(P.gen_iop, n) for n in sorted(os.listdir(P.gen_iop)) if n.endswith(".c")]
+    src += [os.path.join(P.gen_vu, n) for n in sorted(os.listdir(P.gen_vu)) if n.endswith(".c")]   # one file per VU1 program
     hdr = []
     for d in (rt, P.gen, P.gen_vu):
         hdr += [os.path.join(d, n) for n in sorted(os.listdir(d)) if n.endswith(".h")]
@@ -747,8 +748,8 @@ def compile_game(P, C, log, progress=None):
         newkeys[tag] = k
         if not (os.path.isfile(o) and keys.get(tag) == k):
             todo.append((tag, p, o))
-    # vu.c (with the recompiled VU1 programs) is still the largest file: start it first
-    todo.sort(key=lambda t: t[1].endswith(os.sep + "vu.c"), reverse=True)
+    # the VU1 programs are the largest files: start them first
+    todo.sort(key=lambda t: os.path.basename(os.path.dirname(t[1])) == "gen_vu", reverse=True)
     log("compiling %d of %d files%s" % (len(todo), len(src), " (the first build takes about a minute)" if len(todo) > 20 else ""))
     done = [0]
     errors = []

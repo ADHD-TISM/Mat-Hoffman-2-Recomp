@@ -119,7 +119,7 @@ previous city's progress); free ride levels too. Found and fixed:
 - recomp_ee.py: C++ thunks reached only through vtables (`j fn; nop`
   padded) and an empty `jr ra` right after a tail jump are entries now (42
   were missing; Session/Free ride crashed at 0x119a40, Chicago at 0x3232a0).
-- 18 more VU1 programs (40 in gen_vu). vu.c takes ~8 min to compile now.
+- 19 more VU1 programs (41 in gen_vu).
 - Known, harmless so far: "vif1: unknown command ad6bad6b" once, at X on
   the results screen (also before these changes); libmtap version warning.
 Developer build with an own clang: set MH2_CLANG. Update tab downloads need a
@@ -143,8 +143,10 @@ GitHub release of ADHD-TISM/Mat-Hoffman-2-Recomp (none yet).
    interrupts); cdvd.c image-type detection by size.
 4. Leftovers from the old game: skip_intro movie names in pad.c, menu.c texts,
    widescreen hooks.
-5. vu.c compile time (~8 min with 40 programs) makes the launcher's first
-   build slow: split vu1_rec.h into its own files compiled in parallel.
+5. Done 2026-11-23: runtime/vu_core.h holds the VU types, register files,
+   inline helpers and VU_PAIR macros; recomp_vu.py writes one
+   gen_vu/vu1_rec_<hash>.c per program (vu1_rec.h keeps the table). A full
+   launcher build (translate + compile) is 1 min 17 s, was ~9 min.
 6. Known game names: 1dd4b0 fopen, 1dd6a0 fread, 1dd380 file table entry,
    1dd540 CD read, 36b940 snprintf, 36a950 printf core, 3a0d00 strlen,
    22ff60 end of frame / swap, 230870 display registers, 20f370 pad poll.
