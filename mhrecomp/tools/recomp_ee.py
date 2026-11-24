@@ -239,14 +239,23 @@ def analyse(exe, entry, entries):
                 break
     return f
 
+def ends_flow(v, exe=None, a=None):
+    # an unconditional jump that does not return: `j`, `jr ra`, or a virtual tail
+    # call `jr t9` (a `jr` with no switch table behind it); the pair after its delay
+    # slot starts whatever comes next. A switch `jr` is not an end: its case labels
+    # follow it.
+    if v is None: return False
+    if (v >> 26) == 2 or v == 0x03e00008: return True
+    if (v & 0xfc1ff83f) == 0x00000008 and exe is not None and a is not None:
+        return not find_jump_table(exe, Insn(a, v))
+    return False
+
 def plausible_start(exe, t):
     if not exe.inside(t): return False
     w = exe.word(t)
     if w is None or not valid(Insn(t, w)): return False
     if t == exe.text[0]: return True
-    if exe.word(t - 8) == 0x03e00008: return True
-    v = exe.word(t - 8)
-    if v is not None and (v >> 26) == 2: return True     # after a tail jump `j fn; <delay>`
+    if ends_flow(exe.word(t - 8), exe, t - 8): return True          # after `jr ra`, a tail jump `j fn` or `jr t9`, + delay slot
     if (w >> 16) in (0x27bd, 0x67bd) and (w & 0x8000): return True
     # after zero padding that follows a `jr ra` or a `j` (C++ thunks: `j fn; nop`
     # padded to 16 bytes, reached only through vtables)
@@ -255,7 +264,7 @@ def plausible_start(exe, t):
     if p < t - 4:
         for q in (p, p - 4):
             v = exe.word(q)
-            if v is not None and (v == 0x03e00008 or (v >> 26) == 2): return True
+            if ends_flow(v, exe, q): return True
     return False
 
 def discover(exe, extra):
@@ -274,7 +283,7 @@ def discover(exe, extra):
         # before them ("call to unknown address" in play). A `j` in the middle of a
         # function gives a spare entry, which is harmless (WEAK below).
         pw = exe.word(a - 8)
-        if pw == 0x03e00008 or (pw is not None and (pw >> 26) == 2):
+        if ends_flow(pw, exe, a - 8):   # also `jr t9` (0x26eea0 followed one and was missing)
             t = a
             while exe.word(t) == 0 and t < exe.text[1] - 4: t += 4
             w = exe.word(t)
@@ -562,6 +571,9 @@ def main():
     funcs = discover(exe, extra)
     entries = set(funcs); keys = sorted(funcs)
     os.makedirs(a.out_dir, exist_ok=True)
+    import re as _re
+    for old in os.listdir(a.out_dir):   # a run that makes fewer files must not leave the old ones (duplicate symbols)
+        if _re.fullmatch(r'code_\d{3}\.c', old): os.remove(os.path.join(a.out_dir, old))
     hdr = ['/* generated */', '#pragma once', '#include "ee.h"']
     hdr += [f'void f_{e:08x}(void);' for e in keys]
     open(os.path.join(a.out_dir, 'funcs.h'), 'w').write(NL.join(hdr) + NL)

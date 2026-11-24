@@ -19,5 +19,8 @@ ls gen/*.c gen_iop/*.c gen_vu/*.c runtime/*.c | xargs -P 16 -I{} sh -c '
   if [ ! -f "$obj" ] || [ "$src" -nt "$obj" ] || [ runtime/ee.h -nt "$obj" ] || [ runtime/rt.h -nt "$obj" ] || [ runtime/iop.h -nt "$obj" ] || { case "$src" in runtime/*) [ runtime/config.h -nt "$obj" ] || [ runtime/gs.h -nt "$obj" ];; *) false;; esac; } || { [ "$src" = runtime/vu.c ] && [ -f gen_vu/vu1_rec.h ] && [ gen_vu/vu1_rec.h -nt "$obj" ]; } || { case "$src" in runtime/vu.c|gen_vu/*) [ runtime/vu_core.h -nt "$obj" ];; *) false;; esac; }; then
     $CC $CFLAGS -c "$src" -o "$obj" || exit 255
   fi'
-$CC -g build/obj/*.o -o build/mh2.exe -Wl,--stack,67108864 -lwinmm -lgdi32 -luser32 -lopengl32
+# link the objects of the current sources only: a regen that makes fewer gen/ or
+# gen_vu/ files leaves stale objects behind, and a glob would link them too
+OBJS=$(ls gen/*.c gen_iop/*.c gen_vu/*.c runtime/*.c | tr '/' '_' | sed 's/\.c$/.o/; s|^|build/obj/|')
+$CC -g $OBJS -o build/mh2.exe -Wl,--stack,67108864 -lwinmm -lgdi32 -luser32 -lopengl32
 echo "built build/mh2.exe"
