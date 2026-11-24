@@ -16,17 +16,19 @@ EE entries. Screenshots: `GS_SHOT=<absolute path, forward slashes>`
 `GS_SHOT_EVERY=N` then `SHEET_DIV=2 python -I tools/sheet.py out.png COLS *.ppm`
 (the game changes the working directory, so a relative GS_SHOT fails).
 
-## State (2026-11-23, second session): playable start to finish
-Boot movies (Activision O2, Rainbow, intro), title, main menu, rider select,
-memory card saves (road trip and scrapbook: "Save ... was successful", files in
-`disc\memcard\mc0\BASLUS-20335BMX*`), the road trip video, loading, and the
-first level (Oklahoma City) all work in scripted runs. A full 2:00 run ends in
-the results screen; "back to bus" reloads and a second run starts. Sound plays
-(movies, title music, 387 key-ons in a run; checked by RMS on SPU_WAV, not by
-ear). Real time in the window: 7200 frames, 53 over 17 ms, 0 audio underruns.
-VU1 microcode is recompiled (22 programs in gen_vu/, VU_CHECK clean on the
-menu route). Not yet tried: other levels and modes, in-game "save" on the
-results screen, loading a save, multiplayer, park editor, hand play.
+## State (2026-11-24)
+Scripted runs: boot movies, title, menus, rider select, the road trip
+videos. Oklahoma City in Road trip: a full 2:00 run, results, "back to bus"
+and the next run. Session, Free ride and 2-player Horse load and ride
+Oklahoma City. Chicago (Road trip, reached with MH2_UNLOCK) loads and rides.
+Saves: road trip and results-screen saves, boot autoload restores the career
+(see Saves). Sound plays (checked by RMS on SPU_WAV, not by ear). Real time:
+Oklahoma City 53 slow frames in 7200; Chicago 45 in 12540 with 10 audio
+underruns after the speed work. 41 VU1 programs recompiled, VU_CHECK clean.
+Hand play by the user started 2026-11-23 (found 0x119a40 and 0x26eea0, both
+fixed). Not yet tried: the other 6 cities, secret levels, park editor, most
+of multiplayer. Widescreen has no 3D hook in this game (the option gives no
+wider view).
 
 Scripted route (turbo, vblank numbers): `3600:start` skips the intro video,
 `3900:start` leaves the title, then X every 250 frames from 4300 walks road
@@ -87,8 +89,9 @@ changed): reads SLUS_203.35 and PS2SOUND.IRX from the user's image, runs the
 recompilers (`--code 42bf00-432980`), rebuilds the VU1 snapshots from
 `vu_recipe.json`, compiles into `work/`, puts mh2.exe + mh2.ini in `game/`,
 and starts it with `--image <iso> <game folder>`. Root = the repository folder;
-the disc image goes in `Mat Hoffman 2/` or is chosen on the Build tab.
-`sh launcher/build_exe.sh` makes `Mat Hoffman 2 Launcher.exe` (PyInstaller).
+the disc image goes in `Mat Hoffman's Pro BMX 2/` (the old name `Mat Hoffman 2/`
+still works) or is chosen on the Build tab.
+`sh launcher/build_exe.sh` makes `Mat Hoffman's Pro BMX 2 Launcher.exe` (PyInstaller).
 After recording new VU1 programs: `python -I tools/mkvurecipe.py gen_vu
 vu_recipe.json ../disc/SLUS_203.35` (all programs so far are inside the ELF).
 

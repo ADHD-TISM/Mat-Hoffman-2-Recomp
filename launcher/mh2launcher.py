@@ -2,7 +2,7 @@
 """Launcher for the Mat Hoffman's Pro BMX 2 (PS2) recompilation, on Windows.
 
 Sets up, builds, updates and starts the game. You need your own copy of the
-game (SLUS-20335, USA): put the .bin/.cue or .iso in the "Mat Hoffman 2" folder
+game (SLUS-20335, USA): put the .bin/.cue or .iso in the "Mat Hoffman's Pro BMX 2" folder
 next to this launcher. No other installs are needed: the build tools (a C
 compiler and Python for the code generators) are downloaded into tools/, and
 nothing is written outside the launcher's folder.
@@ -13,7 +13,7 @@ nothing is written outside the launcher's folder.
     python mh2launcher.py --root DIR ...      keep everything in DIR instead
     python mh2launcher.py --disc FILE ...     use this disc image
 
-Folders under the root: "Mat Hoffman 2" (your disc image), tools/ (compiler and
+Folders under the root: "Mat Hoffman's Pro BMX 2" (your disc image), tools/ (compiler and
 Python, downloaded), mhrecomp/ (the project: recompilers and runtime), work/
 (files read from the disc, generated code, objects) and game/ (the built game,
 mh2.ini and its log). Updates never touch game/, so your settings are kept.
@@ -42,6 +42,7 @@ REPO = "ADHD-TISM/Mat-Hoffman-2-Recomp"
 LAUNCHER_VERSION = "2"
 
 GAME_NAME = "Mat Hoffman's Pro BMX 2"
+DISC_DIR = GAME_NAME        # the folder next to the launcher where people put their disc image
 GAME_SERIAL = "SLUS-20335"
 GAME_EXE = "SLUS_203.35"
 IOP_MODULES = [("PS2SOUND.IRX", "ps2sound", "80000")]   # (file on the disc, name, load address) for recomp_iop.py; runtime/iop.c links iop_mod_ps2sound
@@ -76,7 +77,7 @@ def default_root():
     here = os.path.dirname(os.path.abspath(sys.executable if FROZEN else __file__))
     d = here
     for _ in range(3):
-        if os.path.isdir(os.path.join(d, "Mat Hoffman 2")) or os.path.isdir(os.path.join(d, "mhrecomp")):
+        if any(os.path.isdir(os.path.join(d, x)) for x in (DISC_DIR, "Mat Hoffman 2", "mhrecomp")):
             return d
         d = os.path.dirname(d)
     return here
@@ -96,7 +97,10 @@ class Paths:
         self.obj = os.path.join(self.work, "obj")
         self.llvm = os.path.join(self.tools, "llvm-mingw")
         self.pydir = os.path.join(self.tools, "python")
-        self.discdir = os.path.join(self.root, "Mat Hoffman 2")     # where people put their game
+        self.discdir = os.path.join(self.root, DISC_DIR)     # where people put their game
+        old = os.path.join(self.root, "Mat Hoffman 2")        # its name before 2026-11-24
+        if not os.path.isdir(self.discdir) and os.path.isdir(old):
+            self.discdir = old
         self.game = os.path.join(self.root, "game")
         self.exe = os.path.join(self.game, EXE_FILE)
         self.ini = os.path.join(self.game, INI_FILE)
@@ -553,7 +557,7 @@ def check_disc(C, path):
 
 
 def find_disc(P, C):
-    """The first image of this game in the "Mat Hoffman 2" folder (or one folder inside it), or None."""
+    """The first image of this game in the "Mat Hoffman's Pro BMX 2" folder (or one folder inside it), or None."""
     try:
         os.makedirs(P.discdir, exist_ok=True)
         cands = {".cue": [], ".bin": [], ".iso": []}
@@ -805,7 +809,7 @@ def compile_game(P, C, log, progress=None):
 
 def build_all(P, C, disc, log, progress=None):
     if not disc:
-        raise Fail("put your game in the \"Mat Hoffman 2\" folder or choose it first (Build tab)")
+        raise Fail("put your game in the \"%s\" folder" % DISC_DIR + " or choose it first (Build tab)")
     if not toolchain_ok(P) or not project_ok(P):
         raise Fail("download the build tools first (Update tab)")
     generate(P, C, disc, log)
@@ -840,7 +844,7 @@ SETTINGS = [
     ("fullscreen", "Video", "Start in fullscreen", "bool", B01, "0",
      "1 = start in borderless fullscreen (F11 or Alt+Enter toggles while playing)"),
     ("widescreen", "Video", "Widescreen (16:9)", "bool", B01, "0",
-     "1 = a wider 3D view shown at 16:9 (the menus and on-screen text are stretched)"),
+     "Not working in this game yet: there is no 3D view hook, so 1 gives no wider view"),
     ("aspect", "Video", "Aspect ratio", "choice", ["4:3", "stretch"], "4:3",
      "4:3 = console shape with black bars, stretch = fill the window"),
     ("filter", "Video", "Picture filter", "choice", ["smooth", "nearest"], "smooth",
@@ -1095,7 +1099,7 @@ def gui(root_dir, notice=None):
     P = Paths(root_dir)
     C = Config(P.cfg)
     win = tk.Tk()
-    win.title("Mat Hoffman 2 Recomp launcher")
+    win.title("%s Recomp launcher" % GAME_NAME)
     win.geometry("780x660")
     win.minsize(660, 540)
     q = queue.Queue()
@@ -1214,7 +1218,7 @@ def gui(root_dir, notice=None):
     b = tabs["Build"]
     ttk.Label(b, text="Your game image (%s, %s): .cue + .bin, or .iso" % (GAME_NAME, GAME_SERIAL)).pack(anchor="w")
     ttk.Label(b, style="Muted.TLabel", wraplength=680,
-              text="Put it in the \"Mat Hoffman 2\" folder next to the launcher and it is found automatically, "
+              text="Put it in the \"%s\" folder" % DISC_DIR + " next to the launcher and it is found automatically, "
                    "or browse to it anywhere. You need your own copy of the game.").pack(anchor="w")
     disc_var = tk.StringVar(value=C.get("disc", ""))
     row = ttk.Frame(b)
@@ -1391,7 +1395,7 @@ def gui(root_dir, notice=None):
             except (Fail, OSError) as e:
                 disc_msg.configure(text=str(e), foreground=pal["bad"])
         else:
-            disc_msg.configure(text="No game image yet: put yours in the \"Mat Hoffman 2\" folder.", foreground=pal["muted"])
+            disc_msg.configure(text="No game image yet: put yours in the \"%s\" folder" % DISC_DIR + ".", foreground=pal["muted"])
         return first_bad
 
     def work(fn, done_msg):
@@ -1469,7 +1473,7 @@ def gui(root_dir, notice=None):
                         bt.configure(state="normal")
                     if kind == "error":
                         log("ERROR: " + val)
-                        messagebox.showerror("Mat Hoffman 2 launcher", val)
+                        messagebox.showerror(GAME_NAME + " launcher", val)
                     else:
                         log(val)
                     refresh()
@@ -1484,7 +1488,7 @@ def gui(root_dir, notice=None):
     pump()
     if notice:
         log("ERROR: " + notice)
-        win.after(300, lambda: messagebox.showerror("Mat Hoffman 2 launcher", notice))
+        win.after(300, lambda: messagebox.showerror(GAME_NAME + " launcher", notice))
     win.mainloop()
     return 0
 

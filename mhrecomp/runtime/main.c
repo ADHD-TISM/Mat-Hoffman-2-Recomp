@@ -24,7 +24,7 @@ static void missing_code(u32 addr, const char *what) {
         snprintf(msg, sizeof msg, "The game %s %08x, which was not recompiled, and has to stop.\n\n"
                  "The address was added to %s\\missing_entries.txt. Please report it. (Developers: add it "
                  "to mhrecomp\\extra_ee.txt and build again; the game then gets past this point.)", what, addr, cwd);
-        MessageBoxA(NULL, msg, "mh2recomp: missing code", MB_OK | MB_ICONERROR);
+        MessageBoxA(NULL, msg, "Mat Hoffman's Pro BMX 2: missing code", MB_OK | MB_ICONERROR);
     }
     exit(3);
 }

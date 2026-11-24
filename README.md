@@ -15,13 +15,16 @@ reads the code from your disc image and builds the game on your PC.
 Tested so far, mostly with scripted input:
 
 - The intro movies, menus and the road trip videos.
-- Oklahoma City in Road trip, Session, Free ride and 2-player Horse, and
-  Chicago in Road trip: a full 2:00 run, the results screen and the next run.
+- Oklahoma City in Road trip: a full 2:00 run, the results screen and the
+  next run.
+- Session, Free ride and 2-player Horse load and ride Oklahoma City.
+- Chicago (Road trip) loads and rides. It was reached with a test unlock; on a
+  normal save it opens after Oklahoma City.
 - Saving and loading on a memory card (road trip and results-screen saves,
   automatic load at start).
 - Music, sound effects and movie sound.
 - Keyboard and Xbox-style gamepads.
-- 60 fps in real time in the levels tried.
+- Close to 60 fps in real time in the levels tried (a few slow frames).
 
 Not tested yet: the other road trip cities, the secret levels, the park
 editor and most of multiplayer. Widescreen does not work in this game yet.
@@ -36,8 +39,10 @@ box (see Troubleshooting).
 - Your own disc image of **Mat Hoffman's Pro BMX 2, USA (SLUS-20335),
   version 1.00**: an `.iso`, or a `.bin` + `.cue`. Other regions do not work.
 
-You do not need to install a compiler or Python. The launcher downloads its own
-build tools into its folder and writes nothing outside it.
+The launcher downloads its own compiler into its folder and writes nothing
+outside it. Until a release exists you also need Python 3 with Tk to run or
+build the launcher (the python.org installer includes Tk), plus PyInstaller
+to build the `.exe`.
 
 ## Install and play
 
@@ -45,11 +50,12 @@ There is no release download yet. Until there is, run the launcher from a
 copy of this repository: it then uses the `mhrecomp` folder next to it.
 
 1. Clone or download this repository.
-2. Build the launcher: `sh launcher/build_exe.sh` (needs Python 3 with
-   PyInstaller). It writes `Mat Hoffman 2 Launcher.exe` to the repository
-   folder. You can also run `python launcher/mh2launcher.py` directly.
-3. Start the launcher once. It creates a folder called `Mat Hoffman 2` next to
-   it. Copy your disc image into that folder.
+2. Build the launcher: `sh launcher/build_exe.sh`. It writes
+   `Mat Hoffman's Pro BMX 2 Launcher.exe` to the repository folder. You can
+   also run `python launcher/mh2launcher.py` directly.
+3. Start the launcher once. It creates a folder called
+   `Mat Hoffman's Pro BMX 2` in the repository folder. Copy your disc image
+   into that folder, or choose it on the **Build** tab.
 4. Open the **Update** tab and click **Download**. This fetches the build
    tools (about 200 MB).
 5. Open the **Build** tab and click **Build the game**. The first build takes
@@ -85,11 +91,16 @@ X = Square, Y = Triangle). A second gamepad is player 2. **F11** or
 In the game: press Start once to skip the intro movie, and Start again at the
 title. On the results screen, Circle saves and Cross continues.
 
+**Esc** (or Back+Start on a gamepad) pauses the game and opens a menu with
+settings and Exit. Its changes are saved to `game\mh2.ini`.
+
 ## Settings
 
-The **Settings** tab edits `game\mh2.ini`: internal resolution, window size,
-fullscreen, picture shape, picture filter, volume, vsync, gamepad vibration
-and the key bindings. Delete `mh2.ini` to get the defaults back.
+The launcher's **Settings** tab and the in-game menu edit `game\mh2.ini`:
+internal resolution, window size, fullscreen, picture shape, picture filter,
+volume, vsync, gamepad vibration and the key bindings. To get the defaults
+back, click **Reset to defaults** in the Settings tab. The widescreen option
+does not work in this game yet.
 
 ## Saves
 
@@ -103,8 +114,8 @@ The memory card is the folder `game\memcard\mc0`. Back it up to keep your saves.
   open an issue with the address from the message and what you were doing.
   The address is also written to `game\missing_entries.txt`.
 - **The game closes without a message:** the launcher's log says why, and
-  `game\mh2.log` holds the game's own messages. Attach its last lines to an
-  issue.
+  `game\mh2.log` holds the game's own messages (unless the console window
+  option in **Settings > Debug** is on). Attach its last lines to an issue.
 
 ## Building from source (developers)
 
@@ -123,7 +134,7 @@ The launcher does all of this for you. To work on the code directly:
 - `mhrecomp/NOTES.md` holds the research notes, test routes and current state.
 - The launcher's source is `launcher/mh2launcher.py`
   (`python launcher/mh2launcher.py --help`). `launcher/build_exe.sh` builds
-  `Mat Hoffman 2 Launcher.exe` with PyInstaller.
+  `Mat Hoffman's Pro BMX 2 Launcher.exe` with PyInstaller.
 
 Never commit game data: no disc images, extracted files or generated code.
 The `.gitignore` only lets source files in.
