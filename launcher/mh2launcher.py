@@ -957,13 +957,31 @@ def play(P, C, log):
         if f in C.get("debug_flags", []):
             args += f.split()
     args.append(P.game)
+    if not built_ok(P, C):
+        log("note: the project changed since the game was built (or the last build failed): Build to update it")
+    logpath = os.path.join(P.game, "mh2.log")
     if C.get("debug_console", False):
-        subprocess.Popen(args, cwd=P.game, creationflags=NEW_CONSOLE)
+        proc = subprocess.Popen(args, cwd=P.game, creationflags=NEW_CONSOLE)
     else:
-        logf = open(os.path.join(P.game, "mh2.log"), "w")    # what the game prints, for when something goes wrong
-        subprocess.Popen(args, cwd=P.game, creationflags=NO_WINDOW, stdout=logf, stderr=subprocess.STDOUT)
+        logf = open(logpath, "w")    # what the game prints, for when something goes wrong
+        proc = subprocess.Popen(args, cwd=P.game, creationflags=NO_WINDOW, stdout=logf, stderr=subprocess.STDOUT)
         logf.close()
-    log("started the game (its messages go to %s)" % os.path.join(P.game, "mh2.log"))
+    log("started the game (its messages go to %s)" % logpath)
+
+    def watch():   # say when the game stops with an error instead of just closing
+        code = proc.wait()
+        if code == 0:
+            return
+        last = ""
+        try:
+            with open(logpath, encoding="utf-8", errors="replace") as f:
+                lines = [ln.strip() for ln in f if ln.strip() and "runs recompiled" not in ln]
+            last = next((ln for ln in reversed(lines) if "unknown address" in ln or "fell off" in ln), lines[-1] if lines else "")
+        except OSError:
+            pass
+        what = "it reached code that was not recompiled" if code == 3 else "exit code %d" % (code & 0xffffffff)
+        log("the game stopped: %s%s" % (what, (" (" + last + ")") if last else ""))
+    threading.Thread(target=watch, daemon=True).start()
 
 
 # ---------------------------------------------------------------- status

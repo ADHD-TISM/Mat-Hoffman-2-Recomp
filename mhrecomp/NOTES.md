@@ -4,7 +4,7 @@ Layout (all inside `rea\Mat Hoffman's Pro BMX 2 (USA)\`): the `.iso`, `disc\`
 (extracted with `tools/isoextract.py`), `mhrecomp\` (this project), `shots\`
 (test screenshots). Runtime and tools were copied from the Dave Mirra 2 project
 (`rea\Dave Mirra PS2\bmx2recomp`, skill `ps2-static-recomp`) on 2026-11-22 and
-adapted. Not a git repo yet.
+adapted. Git repository: the game folder (remote ADHD-TISM/Mat-Hoffman-2-Recomp).
 
 ## Build / run
     sh regen.sh        # EE ELF -> gen/*.c (passes --extra extra_ee.txt --code 42bf00-432980)

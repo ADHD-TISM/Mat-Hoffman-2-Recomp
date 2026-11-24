@@ -19,10 +19,11 @@ static void missing_code(u32 addr, const char *what) {
     FILE *m = fopen("missing_entries.txt", "a");
     if (m) { fprintf(m, "%08x\n", addr); fclose(m); }
     if (show_window) {
-        char msg[512];
-        snprintf(msg, sizeof msg, "The game %s %08x, which was not recompiled.\n\n"
-                 "The address was added to disc\\missing_entries.txt. Add it to extra_ee.txt, "
-                 "run tools/recomp_ee.py and build.sh, and the game will get past this point.", what, addr);
+        char msg[1024], cwd[MAX_PATH] = "";
+        GetCurrentDirectoryA(sizeof cwd, cwd);
+        snprintf(msg, sizeof msg, "The game %s %08x, which was not recompiled, and has to stop.\n\n"
+                 "The address was added to %s\\missing_entries.txt. Please report it. (Developers: add it "
+                 "to mhrecomp\\extra_ee.txt and build again; the game then gets past this point.)", what, addr, cwd);
         MessageBoxA(NULL, msg, "mh2recomp: missing code", MB_OK | MB_ICONERROR);
     }
     exit(3);
