@@ -262,6 +262,7 @@ static u32 io_read32_raw(u32 a) {
  * jumps to that event. Timers (their counts move with time) and the IPU are
  * left alone. --log-io turns it off only for logging clarity. */
 u64 n_poll_skips, n_poll_skipped_cycles;
+static int g_fin_armed;   /* the game cleared CSR.FINISH since the last early answer (io_write32) */
 static inline int pollable(u32 pa) {
     if (pa >= 0x10000000 && pa < 0x10003000) return 0;     /* timers, IPU */
     /* GS CSR has its own rule in io_read32 (it depends on the graphics thread) */
@@ -288,7 +289,11 @@ u32 io_read32(u32 a) {
         if (++reps >= 4) {
             int gst_take_finish(void);
             reps = 0;
-            if (!(v & 2) && gst_take_finish()) {     /* the FINISH it waits for is queued: answer now (gsthread.c) */
+            /* answer early only for a spin that waits for FINISH: the game cleared it
+               (g_fin_armed) and it is still clear. A spin on another CSR bit (VSINT,
+               SIGNAL) must not use up a queued FINISH, or the real one is swallowed later. */
+            if (g_fin_armed && !(v & 2) && gst_take_finish()) {   /* the FINISH it waits for is queued: answer now (gsthread.c) */
+                g_fin_armed = 0;
                 gs_csr |= 2;
                 if (!(gs_imr & 0x200)) intc_raise(0);
                 last_pa = pa; last_v = v = io_read32_raw(a); last_cyc = ee.cycles;
@@ -359,6 +364,7 @@ void io_write32(u32 a, u32 v) {
         if (pa == 0x12001000) {
             if (v & 0x200) gs_csr &= ~0x1fu;      /* reset */
             gs_csr &= ~(v & 0x1f);
+            if (v & 2) g_fin_armed = 1;           /* FINISH cleared: a spin on it may follow (early FINISH, io_read32) */
             return;
         }
         if (pa == 0x12001010) { gs_imr = v; return; }

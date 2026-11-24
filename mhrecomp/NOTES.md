@@ -101,6 +101,11 @@ underruns -> 45 and 10. Three changes:
   the FINISH writes it queues on path 3 and answers the spin at once; the GS
   stage swallows its own post for those. GS_EARLY_FINISH=0 turns it off. The
   EE may now run up to the frames-ahead limit (2) ahead of the screen.
+  It answers only a spin that follows a CSR FINISH clear (hw.c g_fin_armed),
+  so a spin on another CSR bit cannot use up a queued FINISH. Repeatable
+  runs: if the GS stage already reached the FINISH before the 4th read, the
+  normal post is seen earlier; runs matched on this machine, but a much
+  faster host could still drift.
 - Texture cache (gs_gl.c): the game uploads its textures again every frame
   with the same bytes. A hash of the source blocks skips the decode and the
   GL upload when unchanged (214k decodes -> 11k on the Chicago route).

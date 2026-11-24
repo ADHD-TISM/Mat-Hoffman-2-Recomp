@@ -170,7 +170,7 @@ static int count_finish(const u8 *p, u32 nqw) {
             continue;
         }
         if (p3.flg == 0) {
-            if (((p3.regs >> (4 * p3.reg)) & 15) == 0xe && (hi & 0xff) == 0x61) n++;
+            if (((p3.regs >> (4 * p3.reg)) & 15) == 0xe && (hi & 0x7f) == 0x61) n++;
             if (++p3.reg >= p3.nreg) { p3.reg = 0; if (++p3.loop >= p3.nloop) p3.active = 0; }
         } else if (p3.flg == 1) {
             for (int h = 0; h < 2 && p3.active; h++)
@@ -222,7 +222,10 @@ void gst_present(const u64 *priv) {
     put(C_PRESENT, (u32)t.QuadPart, (u32)(t.QuadPart >> 32), priv, 0x20 * 8);
 }
 
-static u64 sync_ticks, sync_ticks_late;   /* EE time spent in gst_sync; _late: after frame 6600 */
+/* EE time spent in gst_sync; _late: after STATS_FROM (default 6600, past the
+   boot movies and menus of the test routes) */
+static u64 sync_ticks, sync_ticks_late;
+static u64 stats_from(void) { static u64 f = ~0ull; if (f == ~0ull) { const char *e = getenv("STATS_FROM"); f = e ? strtoull(e, 0, 10) : 6600; } return f; }
 void gst_sync(void) {
     if (!g_gs_mt) return;
     n_syncs++;
@@ -231,7 +234,7 @@ void gst_sync(void) {
     while (split && ld(&r2.tail) != ld(&r2.head)) ee_wait();
     QueryPerformanceCounter(&t1);
     sync_ticks += (u64)(t1.QuadPart - t0.QuadPart);
-    if (g_frame > 6600) sync_ticks_late += (u64)(t1.QuadPart - t0.QuadPart);
+    if (g_frame > stats_from()) sync_ticks_late += (u64)(t1.QuadPart - t0.QuadPart);
 }
 
 /* SIGNAL (1) / FINISH (2) bits the GS stage raised: CSR and the GS interrupt, on the EE */
@@ -358,8 +361,8 @@ void gst_stats(void) {
         (unsigned long long)n_cmds, n_bytes / 1048576.0, (unsigned long long)r1.n_waits_full,
         (unsigned long long)n_waits_frames, (unsigned long long)n_syncs);
     { LARGE_INTEGER f; QueryPerformanceFrequency(&f);
-      LOG("gst: the EE waited %.1f s in full syncs (%.1f s after frame 6600); %llu FINISH answered early%s\n",
-          (double)sync_ticks / f.QuadPart, (double)sync_ticks_late / f.QuadPart, (unsigned long long)n_fin_early,
+      LOG("gst: the EE waited %.1f s in full syncs (%.1f s after frame %llu); %llu FINISH answered early%s\n",
+          (double)sync_ticks / f.QuadPart, (double)sync_ticks_late / f.QuadPart, (unsigned long long)stats_from(), (unsigned long long)n_fin_early,
           fin_on ? "" : " (GS_EARLY_FINISH=0)"); }
     if (split) LOG("gst: %.1f MB of GIF data passed to the GS stage, %llu waits for room there\n",
         n_fwd_bytes / 1048576.0, (unsigned long long)r2.n_waits_full);

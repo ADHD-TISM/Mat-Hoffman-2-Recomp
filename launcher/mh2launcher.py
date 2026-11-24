@@ -960,13 +960,14 @@ def play(P, C, log):
     if not built_ok(P, C):
         log("note: the project changed since the game was built (or the last build failed): Build to update it")
     logpath = os.path.join(P.game, "mh2.log")
-    if C.get("debug_console", False):
+    console = C.get("debug_console", False)
+    if console:
         proc = subprocess.Popen(args, cwd=P.game, creationflags=NEW_CONSOLE)
     else:
         logf = open(logpath, "w")    # what the game prints, for when something goes wrong
         proc = subprocess.Popen(args, cwd=P.game, creationflags=NO_WINDOW, stdout=logf, stderr=subprocess.STDOUT)
         logf.close()
-    log("started the game (its messages go to %s)" % logpath)
+    log("started the game (its messages go to %s)" % ("its console window" if console else logpath))
 
     def watch():   # say when the game stops with an error instead of just closing
         code = proc.wait()
@@ -974,6 +975,8 @@ def play(P, C, log):
             return
         last = ""
         try:
+            if console:   # the messages went to the console; mh2.log is from an earlier run
+                raise OSError
             with open(logpath, encoding="utf-8", errors="replace") as f:
                 lines = [ln.strip() for ln in f if ln.strip() and "runs recompiled" not in ln]
             last = next((ln for ln in reversed(lines) if "unknown address" in ln or "fell off" in ln), lines[-1] if lines else "")
