@@ -246,6 +246,14 @@ def plausible_start(exe, t):
     if t == exe.text[0]: return True
     if exe.word(t - 8) == 0x03e00008: return True
     if (w >> 16) in (0x27bd, 0x67bd) and (w & 0x8000): return True
+    # after zero padding that follows a `jr ra` or a `j` (C++ thunks: `j fn; nop`
+    # padded to 16 bytes, reached only through vtables)
+    p = t - 4
+    while p >= exe.text[0] and exe.word(p) == 0 and t - p <= 32: p -= 4
+    if p < t - 4:
+        for q in (p, p - 4):
+            v = exe.word(q)
+            if v is not None and (v == 0x03e00008 or (v >> 26) == 2): return True
     return False
 
 def discover(exe, extra):

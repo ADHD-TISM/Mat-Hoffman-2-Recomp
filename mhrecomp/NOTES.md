@@ -41,6 +41,11 @@ reaches the main menu by ~2300.
 - recomp_ee.py: the zero register is now `0ull` in 64-bit expressions.
   `0 << 56` on an int is undefined, clang dropped the store, and the game's
   snprintf lost every `%s` (file names came out empty).
+- recomp_ee.py: C++ thunks (`j fn; nop` padded to 16 bytes, reached only
+  through vtables) count as entries when a data word points at them. Without
+  this 35 entries were missing; Session and Free ride crashed on load with
+  "call to unknown address 00119a40". Road trip, Session, Free ride and
+  2-player Horse all reach Oklahoma City with it (2026-11-23).
 - Stock Sony libcdvd: `runtime/cdvd.c` is cdvdfsv at RPC level (read, search,
   S commands). The game has its own file table at 0x3f0da0 (982 entries,
   `tools/filetable.py`), so it only uses sceCdRead. N command 9 (streaming,
